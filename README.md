@@ -1,3 +1,3 @@
-# ReActed documentation 
+# ReActed.io documentation 
 
-> ReActed is the coolest thing you've ever seen updated
+> ReActed is the coolest project you've ever seen
