@@ -1,3 +1,5 @@
-#Reactor System Configuration
+# Reactor System 
+
+## Configuration
 
 A reactor system configuration is defined by the ```ReActorSystemConfig``` object.

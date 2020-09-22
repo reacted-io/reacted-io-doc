@@ -1,5 +1,4 @@
 # Dispatcher 
 
-> Configure Dispatcher 
-> Use Dispatcher
+## Configuration
 

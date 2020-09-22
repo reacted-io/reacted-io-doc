@@ -1,5 +1,6 @@
 # ReActor
 
-> Configure ReActor
-> Spawn ReActor
+## Life Cycle
+## Configuration
+## Spawn ReActor
 
