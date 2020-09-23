@@ -1,6 +1,14 @@
 # ReActor
 
 ## Life Cycle
+
+### Init
+
+### Stop
+
+> Hierarchical Stop
+
 ## Configuration
-## Spawn ReActor
+
+## Spawning
 
