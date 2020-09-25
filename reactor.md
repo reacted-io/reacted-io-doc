@@ -242,7 +242,7 @@ The output of the above program is the following:
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0 is terminating. Processed: 9
 ```
 
-## ReActors Hierarhies
+## ReActors Hierarchies
 
 
 
