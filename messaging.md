@@ -1,7 +1,7 @@
 # Communicating with a ReActor
 
-## Tell pattern
+## Tell
 
-## A-Tell pattern
+## ATell
 
-## Ask pattern
+## Ask

@@ -131,9 +131,12 @@ import io.reacted.core.config.reactorsystem.ReActorSystemConfig;
 import io.reacted.core.messages.reactors.DeliveryStatus;
 import io.reacted.core.messages.reactors.ReActorInit;
 import io.reacted.core.reactors.ReActions;
+import io.reacted.core.reactors.ReActiveEntity;
 import io.reacted.core.reactorsystem.ReActorContext;
 import io.reacted.core.reactorsystem.ReActorRef;
 import io.reacted.core.reactorsystem.ReActorSystem;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.TimeUnit;
 
 public class PingPongExample {
@@ -153,20 +156,30 @@ public class PingPongExample {
                                                      .peekFailure(error -> exampleReActorSystem.shutDown())
                                                      .orElseSneakyThrow();
 
-        exampleReActorSystem.spawnReActor(ReActions.newBuilder()
-                                                   .reAct(ReActorInit.class,
-                                                          ((ractx, init) -> pongReactor.tell(ractx.getSelf(),
-                                                                                             "FirstPing")))
-                                                   .reAct(String.class, PingPongExample::onPong)
-                                                   .reAct(ReActions::noReAction)
-                                                   .build(),
+        exampleReActorSystem.spawnReActor(new ReActiveEntity() {
+                                            private long pingNum = 0;
+                                            @NotNull
+                                            @Override
+                                            public ReActions getReActions() {
+                                                return ReActions.newBuilder()
+                                                                .reAct(ReActorInit.class, 
+                                                                       ((ractx, init) -> pongReactor.tell(ractx.getSelf(),
+                                                                                                          "FirstPing")))
+                                                                .reAct(String.class, 
+                                                                       (raCtx, pongPayload) -> onPong(raCtx, pongPayload, 
+                                                                                                      ++pingNum))
+                                                                .reAct(ReActions::noReAction)
+                                                                .build();
+                                                
+                                            };
+                                          },
                                           ReActorConfig.newBuilder()
                                                        .setReActorName("Ping")
                                                        .build())
                             .peekFailure(error -> exampleReActorSystem.shutDown())
                             .orElseSneakyThrow();
 
-        TimeUnit.MILLISECONDS.sleep(2);
+        TimeUnit.MILLISECONDS.sleep(3);
         exampleReActorSystem.shutDown();
     }
 
@@ -179,10 +192,10 @@ public class PingPongExample {
                                                                                                                    deliveryError)));
     }
 
-    private static void onPong(ReActorContext raCtx, String pongMessage) {
+    private static void onPong(ReActorContext raCtx, String pongMessage, long pingId) {
         raCtx.getReActorSystem()
-             .logDebug("%s from %s", pongMessage, raCtx.getSender().getReActorId().getReActorName());
-        raCtx.getSender().tell(raCtx.getSelf(), "PingRequest");
+             .logDebug("%s from reactor %s", pongMessage, raCtx.getSender().getReActorId().getReActorName());
+        raCtx.getSender().tell(raCtx.getSelf(), "PingRequest " + pingId);
     }
 }
 ```
@@ -191,14 +204,48 @@ ReActors exist within a [ReActorSystem](reactor_system.md). As JVM is the runtim
 a `ReActorSystem` is the runtime environment for a reactor. Through a `ReActorSystem` we can **spawn** a new reactor.
 Once a reactor has been *spawned* a `ReActorInit` message will be immediately delivered to trigger the *Init* phase.
 
-In the above example we did not use a *class* as a reactor, instead we just provided the behaviors and the config
-for the reactors. The effect of using `ReActions::noReAction` as argument for the wildcard reaction, is to silently 
-ignore all the messages but the ones for which has been specified an explicit reaction. In the above example it means
+In the above example we did not use a *class* as a reactor, instead we provided on once case just the behaviors and 
+the config for the reactor, in the other the config and a convenience inline interface implementation. 
+The effect of using `ReActions::noReAction` as argument for the wildcard reaction, is to silently  ignore all the messages but the ones for which has been specified an explicit reaction. In the above example it means
 that the `ReActorInit` and the `ReActorStop` messages will be silently ignored.
 
 Inside a reaction we saw that we can interact with a reactor through the `ReActorContext` object that is always passed
-as an argument, but from the outside we can do that using a `ReActorRef`. A `ReActorRef` is a location and technology
-agnostic reference that uniquely address a reactor across a ReActed [cluster](clustering.md).
+as an argument. Outside the scope of a reaction, we can do that sending a **message**. 
+It's possible [sending a message](messaging.md) to a reactor using do that its  `ReActorRef`. 
+A `ReActorRef` is a **location and technology agnostic** reference that uniquely address a reactor across a ReActed [cluster](clustering.md).
+
+In the `onPing` method we obtain the `ReActorRef` of the reactor that sent the current message and we [tell](messaging.md#tell)
+another message to reply. `tell` returns a completion stage that is going to be completed with the outcome of the operation.
+It's not mandatory providing a check for the outcome of the operation, it highly depends on the logic of the application.
+ReActed guarantees that no message can be lost on `tell`, but this topic is covered in [messaging](messaging.md) and
+[drivers](drivers.md) chapters. 
+
+The `Ping` reactor has a specific `ReActorInit` reaction. It takes `Pong`'s `ReActorRef` and `tell`s the first message.
+This will initiate a ping-pong of messages between the two reactors for some milliseconds and after that we [shutdown](reactor_system.md#Shutdown) the
+`ReActorSystem`.
+The output of the above program is the following:
+```text
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong FirstPing from reactor Pong
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 1 from reactor Pong
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 2 from reactor Pong
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 3 from reactor Pong
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 4 from reactor Pong
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 5 from reactor Pong
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 6 from reactor Pong
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 7 from reactor Pong
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 8 from reactor Pong
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 9 from reactor Pong
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 10 from reactor Pong
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2 is terminating. Processed: 9
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3 is terminating. Processed: 9
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1 is terminating. Processed: 11
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0 is terminating. Processed: 9
+```
+
+## ReActors Hierarhies
+
+
+
 
 
 
