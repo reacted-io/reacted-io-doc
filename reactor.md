@@ -270,14 +270,12 @@ public class FamilyExample {
                                                                                   .setReactorSystemName("ExampleSystem")
                                                                                   .build()).initReActorSystem();
         try {
-            var father = exampleReActorSystem.spawnReActor(new Father(),
-                                                                       ReActorConfig.newBuilder()
-                                                                                    .setReActorName("Father")
+            var father = exampleReActorSystem.spawnReActor(new Father(), ReActorConfig.newBuilder()
+                                                                                      .setReActorName("Father")
+                                                                                      .build()).orElseSneakyThrow();
+            var uncle = exampleReActorSystem.spawnReActor(new Uncle(), ReActorConfig.newBuilder()
+                                                                                    .setReActorName("Uncle")
                                                                                     .build()).orElseSneakyThrow();
-            var uncle = exampleReActorSystem.spawnReActor(new Uncle(),
-                                                                      ReActorConfig.newBuilder()
-                                                                                   .setReActorName("Uncle")
-                                                                                   .build()).orElseSneakyThrow();
             father.tell(uncle, new BreedRequest(3));
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
