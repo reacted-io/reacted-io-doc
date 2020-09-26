@@ -40,6 +40,9 @@ configuration
 ## Creating a ReActor
 
 Let's see the first example of a reactor.
+The below reactor prints a statement every time a message is processed.  Every time a message is received, we check
+if the time is a multiple of the already received messages num and in that case we request a termination of the
+reactor. Once the termination is completed, a line is printed containing the name of the reactor that was just terminated.
 
 ```java
 import io.reacted.core.config.reactors.ReActorConfig;
@@ -48,13 +51,18 @@ import io.reacted.core.messages.reactors.ReActorStop;
 import io.reacted.core.reactors.ReActions;
 import io.reacted.core.reactors.ReActor;
 import io.reacted.core.reactorsystem.ReActorContext;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.time.Instant;
 
 public class FirstReActor implements ReActor {
+```
+Any class can become a reactor simply implementing the `ReActor` interface. 
+Every ReActor is defined by some `ReActions` and a `ReActorConfig`. 
+
+```java
     private static final Logger LOGGER = LoggerFactory.getLogger(FirstReActor.class);
     private int receivedMsgs;
 
@@ -65,6 +73,12 @@ public class FirstReActor implements ReActor {
                         .reAct(ReActorInit.class, this::onReActorInit)
                         .reAct(ReActorStop.class, this::onReActorStop)
                         .reAct(this::onAnyOtherMessageType)
+```
+Defining a reaction for a given **message type** means
+defining which behavior should be used when a *message* of that type is executed.
+It's possible to specify reactions for a specific message type or providing a wildcard reaction. 
+Pattern matching for message types are done on the exact type.
+```java
                         .build();
     }
 
@@ -73,9 +87,14 @@ public class FirstReActor implements ReActor {
     public ReActorConfig getConfig() {
         return ReActorConfig.newBuilder()
                             .setReActorName(FirstReActor.class.getSimpleName())
+```
+It's mandatory *naming* a reactor. We can have default values for the other configuration properties, but
+a reactor always needs a unique name among its alive siblings. If interested in using the [replay](replay.md) feature,
+a reactor name should always be non randomic
+
+```java
                             .build();
     }
-
     private void onReActorInit(ReActorContext raCtx, ReActorInit init) {
         raCtx.getReActorSystem().logDebug("Init received");
     }
@@ -85,12 +104,32 @@ public class FirstReActor implements ReActor {
     }
 
     private void onAnyOtherMessageType(ReActorContext raCtx, Serializable message) {
+```
+Messages **must** implement the `Serializable` interface. This because the communication between reactors is location
+and technology agnostic, so a message can always virtually go over some other media than shared memory
+
+```java
+
         this.receivedMsgs++;
+```
+No synchronization primitives are required to ensure the correct updated of the counter, regardless of how many threads 
+are sending messages as the same time
+```java
         System.out.printf("Received message type %s%n", message.getClass().getSimpleName());
         if (Instant.now().toEpochMilli() % this.receivedMsgs == 0) {
             raCtx.stop()
+```
+`ReActorContext` provides a set of method useful to control the reactor behavior and to access its internal properties
+```java
                  .toCompletableFuture()
+```
+We can attach an async operation to be executed after that the whole hierarchy has been terminated chaining to the
+completion stage returned by the stop operation
+```java
                  .thenAcceptAsync(noVal -> raCtx.getReActorSystem()
+```
+ReActed offers a [centralized logging system](centralized_logger.md)
+```java
                                                 .logDebug("ReActor %s hierarchy is terminated",
                                                           raCtx.getSelf().getReActorId()
                                                                          .getReActorName()));
@@ -98,32 +137,10 @@ public class FirstReActor implements ReActor {
     }
 }
 ```
-The above reactor prints a statement every time a message is processed.  Every time a message is received, we check
-if the time is a multiple of the already received messages num and in that case we request a termination of the
-reactor. Once the termination is completed, a line is printed containing the name of the reactor that was just terminated.
- 
-From the above code, we can quickly notice that:
-- Any class can become a reactor simply implementing the `ReActor` interface. It's not mandatory for a class to
-implement this interface to be used as a reactor: as long as the `ReActions` and a `ReActorConfig` are provided on
-creation, a reactor can be created.
-- It's possible to setup reactions for a message type or providing a wildcard reaction. Pattern matching for message
-types are done on the exact type.
-- Messages **must** implement the `Serializable` interface. This because the communication between reactors is location
-and technology agnostic, so a message can always virtually go over some other media than shared memory
-- It's mandatory *naming* a reactor. We can have default values for the other configuration properties, but
-a reactor always needs a unique name among its alive siblings. If interested in using the [replay](replay.md) feature,
-a reactor name should always be non randomic
-- ReActed offers a [centralized logging system](centralized_logger.md)
-- No synchronization primitives are required to ensure the correct updated of the counter, regardless of how many threads 
-are sending messages as the same time
-- `ReActorContext` provides a set of method useful to control the reactor behavior and to access its internal properties
-- We can attach an async operation to be executed after that the whole hierarchy has been terminated chaining to the
-completion stage returned by the stop operation
-
 ## ReActors communication
 
 ReActors talk to each other through [messaging](messaging.md). Let's create now a couple of reactors that talk to each
-other performing a simple ping pong.
+other performing a simple ping pong. 
 
 ```java
 import io.reacted.core.config.reactors.ReActorConfig;
@@ -143,20 +160,43 @@ public class PingPongExample {
         ReActorSystem exampleReActorSystem = new ReActorSystem(ReActorSystemConfig.newBuilder()
                                                                                   .setReactorSystemName("ExampleSystem")
                                                                                   .build()).initReActorSystem();
+```
+ReActors exist within a [ReActorSystem](reactor_system.md). As JVM is the runtime environment for a java program,
+a `ReActorSystem` is the runtime environment for a reactor.
+```java
 
         ReActorRef pongReactor = exampleReActorSystem.spawnReActor(ReActions.newBuilder()
                                                                             .reAct(String.class,
                                                                                    PingPongExample::onPing)
                                                                             .reAct(ReActions::noReAction)
                                                                             .build(),
+```
+In this example we did not use a *class* as a reactor, instead we provided on once case just the behaviors and 
+the config for the reactor. The effect of using `ReActions::noReAction` as argument for the wildcard reaction, 
+is to silently  ignore all the messages but the ones for which has been specified an explicit reaction. 
+In the above example it meansthat the `ReActorInit` and the `ReActorStop` messages will be silently ignored.
+Inside a reaction we saw that we can interact with a reactor through the `ReActorContext` object that is always passed
+as an argument. Outside the scope of a reaction, we can do that sending a **message**. 
+It's possible to [send a message](messaging.md) to a reactor using do that its  `ReActorRef`. 
+A `ReActorRef` is a **location and technology agnostic** reference that uniquely address a reactor across a ReActed [cluster](clustering.md).
+
+```java
                                                                    ReActorConfig.newBuilder()
                                                                                 .setReActorName("Pong")
                                                                                 .build())
-                                                     //To be more compact and redundant we could simply flatMap here
+                                                     //To be more compact and less redundant we could simply flatMap here
                                                      .peekFailure(error -> exampleReActorSystem.shutDown())
                                                      .orElseSneakyThrow();
+```
+Through a `ReActorSystem` we can **spawn** a new reactor.
+Once a reactor has been *spawned* a `ReActorInit` message will be immediately delivered to trigger the *Init* phase.
+```java
 
         exampleReActorSystem.spawnReActor(new ReActiveEntity() {
+```
+Instead of providing a full `ReActor` or just a context free set of reactions, we can use the `ReActiveEntity` interface
+to inline reactions and their context 
+```java
                                             private long pingNum = 0;
                                             @Nonnull
                                             @Override
@@ -165,6 +205,11 @@ public class PingPongExample {
                                                                 .reAct(ReActorInit.class, 
                                                                        ((ractx, init) -> pongReactor.tell(ractx.getSelf(),
                                                                                                           "FirstPing")))
+```
+The `Ping` reactor has a specific `ReActorInit` reaction. It takes `Pong`'s `ReActorRef` and `tell`s the first message.
+This will initiate a ping-pong of messages between the two reactors for some milliseconds and after that we [shutdown](reactor_system.md#Shutdown) the
+`ReActorSystem`.
+```java
                                                                 .reAct(String.class, 
                                                                        (raCtx, pongPayload) -> onPong(raCtx, pongPayload, 
                                                                                                       ++pingNum))
@@ -185,6 +230,13 @@ public class PingPongExample {
 
     private static void onPing(ReActorContext raCtx, String pingMessage) {
         raCtx.getSender().tell(raCtx.getSelf(), "Pong " + pingMessage)
+```
+With `getSender()` obtain the `ReActorRef` of the reactor that sent the current message and we [tell](messaging.md#tell)
+another message to reply. `tell` returns a completion stage that is going to be completed with the outcome of the operation.
+It's not mandatory providing a check for the outcome of the operation, it highly depends on the logic of the application.
+ReActed guarantees that no message can be lost on `tell`, but this topic is covered in [messaging](messaging.md) and
+[drivers](drivers.md) chapters.
+```java
                          .toCompletableFuture()
                          .thenAcceptAsync(deliveryStatus -> deliveryStatus.filter(DeliveryStatus::isDelivered)
                                                                           .ifError(deliveryError -> raCtx.getReActorSystem()
@@ -199,30 +251,6 @@ public class PingPongExample {
     }
 }
 ```
-This is complete fully working client/server ping pong application. 
-ReActors exist within a [ReActorSystem](reactor_system.md). As JVM is the runtime environment for a java program,
-a `ReActorSystem` is the runtime environment for a reactor. Through a `ReActorSystem` we can **spawn** a new reactor.
-Once a reactor has been *spawned* a `ReActorInit` message will be immediately delivered to trigger the *Init* phase.
-
-In the above example we did not use a *class* as a reactor, instead we provided on once case just the behaviors and 
-the config for the reactor, in the other the config and a convenience inline interface implementation. 
-The effect of using `ReActions::noReAction` as argument for the wildcard reaction, is to silently  ignore all the messages but the ones for which has been specified an explicit reaction. In the above example it means
-that the `ReActorInit` and the `ReActorStop` messages will be silently ignored.
-
-Inside a reaction we saw that we can interact with a reactor through the `ReActorContext` object that is always passed
-as an argument. Outside the scope of a reaction, we can do that sending a **message**. 
-It's possible [sending a message](messaging.md) to a reactor using do that its  `ReActorRef`. 
-A `ReActorRef` is a **location and technology agnostic** reference that uniquely address a reactor across a ReActed [cluster](clustering.md).
-
-In the `onPing` method we obtain the `ReActorRef` of the reactor that sent the current message and we [tell](messaging.md#tell)
-another message to reply. `tell` returns a completion stage that is going to be completed with the outcome of the operation.
-It's not mandatory providing a check for the outcome of the operation, it highly depends on the logic of the application.
-ReActed guarantees that no message can be lost on `tell`, but this topic is covered in [messaging](messaging.md) and
-[drivers](drivers.md) chapters. 
-
-The `Ping` reactor has a specific `ReActorInit` reaction. It takes `Pong`'s `ReActorRef` and `tell`s the first message.
-This will initiate a ping-pong of messages between the two reactors for some milliseconds and after that we [shutdown](reactor_system.md#Shutdown) the
-`ReActorSystem`.
 The output of the above program is the following:
 ```text
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong FirstPing from reactor Pong
