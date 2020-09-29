@@ -96,7 +96,7 @@ a reactor name should always be non randomic
                             .build();
     }
     private void onReActorInit(ReActorContext raCtx, ReActorInit init) {
-        raCtx.getReActorSystem().logDebug("Init received");
+        raCtx.logInfo("Init received");
     }
 
     private void onReActorStop(ReActorContext raCtx, ReActorStop stop) {
@@ -126,17 +126,15 @@ are sending messages as the same time
 We can attach an async operation to be executed after that the whole hierarchy has been terminated chaining to the
 completion stage returned by the stop operation
 ```java
-                 .thenAcceptAsync(noVal -> raCtx.getReActorSystem()
-```
-ReActed offers a [centralized logging system](centralized_logger.md)
-```java
-                                                .logDebug("ReActor %s hierarchy is terminated",
+                 .thenAcceptAsync(noVal -> raCtx.logInfo("ReActor {} hierarchy is terminated",
                                                           raCtx.getSelf().getReActorId()
                                                                          .getReActorName()));
         }
     }
 }
 ```
+ReActed offers a [centralized logging system](centralized_logger.md)
+
 ## ReActors communication
 
 ReActors talk to each other through [messaging](messaging.md). Let's create now a couple of reactors that talk to each
@@ -239,39 +237,28 @@ ReActed guarantees that no message can be lost on `tell`, but this topic is cove
 ```java
                          .toCompletableFuture()
                          .thenAcceptAsync(deliveryStatus -> deliveryStatus.filter(DeliveryStatus::isDelivered)
-                                                                          .ifError(deliveryError -> raCtx.getReActorSystem()
-                                                                                                         .logError("Delivery Error",
+                                                                          .ifError(deliveryError -> raCtx.logError("Delivery Error",
                                                                                                                    deliveryError)));
     }
 
     private static void onPong(ReActorContext raCtx, String pongMessage, long pingId) {
-        raCtx.getReActorSystem()
-             .logDebug("%s from reactor %s", pongMessage, raCtx.getSender().getReActorId().getReActorName());
-        raCtx.getSender().tell(raCtx.getSelf(), "PingRequest " + pingId);
+        raCtx.logInfo("{} from reactor {}", pongMessage, raCtx.getSender().getReActorId().getReActorName());
+        raCtx.reply("PingRequest " + pingId);
     }
 }
 ```
-The output of the above program is the following:
+`reply` is a shortcut for `raCtx.getSender().tell(raCtx.getSelf(), ...` It is used to `tell` a message to the *sender*
+of the last message received setting the current reactor as source of the reply.
+In the output we can see 
 ```text
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong FirstPing from reactor Pong
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 1 from reactor Pong
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 2 from reactor Pong
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 3 from reactor Pong
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 4 from reactor Pong
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 5 from reactor Pong
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 6 from reactor Pong
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 7 from reactor Pong
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 8 from reactor Pong
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 9 from reactor Pong
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Pong PingRequest 10 from reactor Pong
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2 is terminating. Processed: 9
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3 is terminating. Processed: 9
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1 is terminating. Processed: 11
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0 is terminating. Processed: 9
 ```
 
 ## ReActors Hierarchies
 
+Now 
 
 ```java
 import io.reacted.core.config.ConfigUtils;
@@ -291,6 +278,7 @@ import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.LongStream;
 
+@NonNullByDefault
 public class FamilyExample {
     public static void main(String[] args) {
 
@@ -314,7 +302,7 @@ public class FamilyExample {
     }
 
     private static void onStop(ReActorContext raCtx, ReActorStop stop) {
-        raCtx.getReActorSystem().logDebug(raCtx.getSelf().getReActorId().getReActorName() + " is terminating");
+        raCtx.logInfo(raCtx.getSelf().getReActorId().getReActorName() + " is terminating");
     }
 
     @NonNullByDefault
@@ -337,11 +325,10 @@ public class FamilyExample {
         private void onBreedRequest(ReActorContext raCtx, BreedRequest breedRequest) {
             this.requestedChildren = breedRequest.getRequestedChildren();
 
-            raCtx.getReActorSystem()
-                 .logDebug("%s received a %s for %s from %s",
-                           raCtx.getSelf().getReActorId().getReActorName(),
-                           breedRequest.getClass().getSimpleName(), breedRequest.getRequestedChildren(),
-                           raCtx.getSender().getReActorId().getReActorName());
+            raCtx.logInfo("{} received a {} for {} from {}",
+                          raCtx.getSelf().getReActorId().getReActorName(),
+                          breedRequest.getClass().getSimpleName(), breedRequest.getRequestedChildren(),
+                          raCtx.getSender().getReActorId().getReActorName());
 
             LongStream.range(0, breedRequest.getRequestedChildren())
                       .forEachOrdered(childNum -> raCtx.spawnChild(new Child(childNum, raCtx.getSender())));
@@ -349,8 +336,7 @@ public class FamilyExample {
 
         private void onThankYou(ReActorContext raCtx, ThankYouFather thanks) {
             if (--this.requestedChildren == 0) {
-                raCtx.stop()
-                     .thenAcceptAsync(voidVal -> raCtx.getSender().tell(ReActorRef.NO_REACTOR_REF, new ByeByeUncle()));
+                raCtx.stop().thenAcceptAsync(voidVal -> raCtx.reply(ReActorRef.NO_REACTOR_REF, new ByeByeUncle()));
             }
         }
     }
@@ -367,11 +353,10 @@ public class FamilyExample {
         public ReActions getReActions() { return UNCLE_REACTIONS; }
 
         private static void onGreetingsFromChild(ReActorContext raCtx, Greetings greetingsMessage) {
-            raCtx.getReActorSystem().logDebug("%s received %s. Sending thank you to %s",
-                                              raCtx.getSelf().getReActorId().getReActorName(),
-                                              greetingsMessage.getGreetingsMessage(),
-                                              raCtx.getSender().getReActorId().getReActorName());
-            raCtx.getSender().tell(raCtx.getSelf(), new ThankYouFather());
+            raCtx.logInfo("{} received {}. Sending thank you to {}",
+                          raCtx.getSelf().getReActorId().getReActorName(), greetingsMessage.getGreetingsMessage(), 
+                          raCtx.getSender().getReActorId().getReActorName());
+            raCtx.reply(new ThankYouFather());
         }
 
         private static void onByeByeUncle(ReActorContext raCtx, ByeByeUncle timeToDie) { raCtx.stop(); }
@@ -443,10 +428,6 @@ public class FamilyExample {
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Child-1 is terminating
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Child-2 is terminating
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Uncle is terminating
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3 is terminating. Processed: 4
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2 is terminating. Processed: 7
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1 is terminating. Processed: 7
-[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.runtime.Dispatcher - Dispatcher Thread ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0 is terminating. Processed: 6
 ```
 
 
