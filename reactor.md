@@ -163,11 +163,11 @@ ReActors exist within a [ReActorSystem](reactor_system.md). As JVM is the runtim
 a `ReActorSystem` is the runtime environment for a reactor.
 ```java
 
-        ReActorRef pongReactor = exampleReActorSystem.spawnReActor(ReActions.newBuilder()
-                                                                            .reAct(String.class,
-                                                                                   PingPongExample::onPing)
-                                                                            .reAct(ReActions::noReAction)
-                                                                            .build(),
+        ReActorRef pongReactor = exampleReActorSystem.spawn(ReActions.newBuilder()
+                                                                     .reAct(String.class,
+                                                                            PingPongExample::onPing)
+                                                                     .reAct(ReActions::noReAction)
+                                                                     .build(),
 ```
 In this example we did not use a *class* as a reactor, instead we provided on once case just the behaviors and 
 the config for the reactor. The effect of using `ReActions::noReAction` as argument for the wildcard reaction, 
@@ -190,7 +190,7 @@ Through a `ReActorSystem` we can **spawn** a new reactor.
 Once a reactor has been *spawned* a `ReActorInit` message will be immediately delivered to trigger the *Init* phase.
 ```java
 
-        exampleReActorSystem.spawnReActor(new ReActiveEntity() {
+        exampleReActorSystem.spawn(new ReActiveEntity() {
 ```
 Instead of providing a full `ReActor` or just a context free set of reactions, we can use the `ReActiveEntity` interface
 to inline reactions and their context 
@@ -289,12 +289,12 @@ public class FamilyExample {
                                                                                   .setReactorSystemName("ExampleSystem")
                                                                                   .build()).initReActorSystem();
         try {
-            var father = exampleReActorSystem.spawnReActor(new Father(), ReActorConfig.newBuilder()
-                                                                                      .setReActorName("Father")
-                                                                                      .build()).orElseSneakyThrow();
-            var uncle = exampleReActorSystem.spawnReActor(new Uncle(), ReActorConfig.newBuilder()
-                                                                                    .setReActorName("Uncle")
-                                                                                    .build()).orElseSneakyThrow();
+            var father = exampleReActorSystem.spawn(new Father(), ReActorConfig.newBuilder()
+                                                                               .setReActorName("Father")
+                                                                               .build()).orElseSneakyThrow();
+            var uncle = exampleReActorSystem.spawn(new Uncle(), ReActorConfig.newBuilder()
+                                                                             .setReActorName("Uncle")
+                                                                             .build()).orElseSneakyThrow();
             father.tell(uncle, new BreedRequest(3));
 ```
 A `BreedRequest` is sent to father and a `ReActorRef` to `Uncle` is used to set the source (*sender*) of that message
@@ -337,7 +337,7 @@ A `BreedRequest` is sent to father and a `ReActorRef` to `Uncle` is used to set 
                           raCtx.getSender().getReActorId().getReActorName());
 
             LongStream.range(0, breedRequest.getRequestedChildren())
-                      .forEachOrdered(childNum -> raCtx.spawn(new Child(childNum, raCtx.getSender())));
+                      .forEachOrdered(childNum -> raCtx.spawnChild(new Child(childNum, raCtx.getSender())));
 ```
 Here we *spawn* the requested number of children. The `ReActorRef` to the sender of the last message received by the
 ReActor is passed as argument. In this case, we use the sender of the `BreedRequest`. Since `Uncle` has been used
