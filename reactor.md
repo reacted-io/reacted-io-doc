@@ -258,7 +258,11 @@ In the output we can see
 
 ## ReActors Hierarchies
 
-Now 
+Let's see a toy example involving hierarchies. In the following example we have `Uncle` who asks the `Father` to
+create a variable number of children. Once created a `Child` greets the `Uncle` who issued the breed request.
+When `Uncle` receives a greeting, it sends a `ThankYou` to `Father` for its job. After that `Father` has been thanked
+for once per `Child` created, it kills itself and all its children and then a last request is asynchronously sent to
+`Uncle` to allow it to terminate itself.
 
 ```java
 import io.reacted.core.config.ConfigUtils;
@@ -278,7 +282,6 @@ import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.LongStream;
 
-@NonNullByDefault
 public class FamilyExample {
     public static void main(String[] args) {
 
@@ -293,6 +296,9 @@ public class FamilyExample {
                                                                                     .setReActorName("Uncle")
                                                                                     .build()).orElseSneakyThrow();
             father.tell(uncle, new BreedRequest(3));
+```
+A `BreedRequest` is sent to father and a `ReActorRef` to `Uncle` is used to set the source (*sender*) of that message
+```java
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -331,12 +337,28 @@ public class FamilyExample {
                           raCtx.getSender().getReActorId().getReActorName());
 
             LongStream.range(0, breedRequest.getRequestedChildren())
-                      .forEachOrdered(childNum -> raCtx.spawnChild(new Child(childNum, raCtx.getSender())));
+                      .forEachOrdered(childNum -> raCtx.spawn(new Child(childNum, raCtx.getSender())));
+```
+Here we *spawn* the requested number of children. The `ReActorRef` to the sender of the last message received by the
+ReActor is passed as argument. In this case, we use the sender of the `BreedRequest`. Since `Uncle` has been used
+as sender, all the children will receive a reference to him
+
+```java
         }
 
         private void onThankYou(ReActorContext raCtx, ThankYouFather thanks) {
             if (--this.requestedChildren == 0) {
+```
+When the expected number of `ThankYou` is received by uncle, a termination for the `Father` reactor and all its children
+is triggered. When all the hierarchy has been terminated, a message is asynchronously sent to `Uncle` to trigger its
+demise 
+```java
                 raCtx.stop().thenAcceptAsync(voidVal -> raCtx.reply(ReActorRef.NO_REACTOR_REF, new ByeByeUncle()));
+```
+`ReActorRef.NO_REACTOR_REF` is a constant that represents an invalid `ReActorRef`. Every attempt to send a message to
+that reference ends up in a failure, but it can used as source of a message when no reply is required and should not be
+sent
+```java
             }
         }
     }
@@ -416,8 +438,9 @@ public class FamilyExample {
     private static final class ByeByeUncle implements Serializable { private ByeByeUncle() { } }
 }
 ```
-
-
+In the output below all the message pattern can be seen. It can also be noticed the termination pattern: top down 
+(from father towards the descendants) and only when all the hierarchy has been terminated, the termination process is
+marked as complete
 ```text
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Father received a BreedRequest for 3 from Uncle
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Uncle received Hello from Child-1. Sending thank you to Father
