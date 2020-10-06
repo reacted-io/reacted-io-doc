@@ -6,5 +6,5 @@
 
 ## Configuring the ReActor System
 
-## Initiating a ReActor System
+## Initing a ReActor System
 
