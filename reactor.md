@@ -356,8 +356,7 @@ demise
                 raCtx.stop().thenAcceptAsync(voidVal -> raCtx.reply(ReActorRef.NO_REACTOR_REF, new ByeByeUncle()));
 ```
 `ReActorRef.NO_REACTOR_REF` is a constant that represents an invalid `ReActorRef`. Every attempt to send a message to
-that reference ends up in a failure, but it can used as source of a message when no reply is required and should not be
-sent
+that reference ends up in a failure, but it can used as source of a message when no reply at all is wanted
 ```java
             }
         }
