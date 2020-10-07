@@ -1,3 +1,0 @@
-# Replay
-
-Replay diver details

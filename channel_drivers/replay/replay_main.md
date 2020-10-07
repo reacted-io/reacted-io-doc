@@ -1,4 +1,4 @@
-# Replaying
+# Replay
 
 ## How it works
 

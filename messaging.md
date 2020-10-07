@@ -61,4 +61,4 @@ cannot get a reply.
 The return semantic is the same of the other methods, but with `ask` we must specify the expected reply type and a
 *name* for the request. In any given time, two `ask` with the same request type, the same expected return type,
 the same destination and the same name, cannot cohexist. We will see in detail the ratio behind the naming in **ReActed**
-in the [replay](replay.md) section.  
+in the [replay](channel_drivers/replay/replay_main.md) section.  

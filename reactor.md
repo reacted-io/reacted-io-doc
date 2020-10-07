@@ -89,7 +89,7 @@ Pattern matching for message types are done on the exact type.
                             .setReActorName(FirstReActor.class.getSimpleName())
 ```
 It's mandatory *naming* a reactor. We can have default values for the other configuration properties, but
-a reactor always needs a unique name among its alive siblings. If interested in using the [replay](replay.md) feature,
+a reactor always needs a unique name among its alive siblings. If interested in using the [replay](channel_drivers/replay/replay_main.md) feature,
 a reactor name should always be non randomic
 
 ```java
