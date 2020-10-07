@@ -82,12 +82,22 @@ Some message types cannot be backpressured and not even delayed (such as system 
 ```java
                   .setNonBackpressurable(Set.of(PublisherComplete.class))
 ```
-
+Message types that regardless of the `BackpressuringMailbox` timeout configuration should be reliably delivered, so
+any delivery attempt of one of the specified message types will be converted into a `BackpressuringMailbox.RELIABLE_DELIVERY_TIMEOUT`
+delivery.
 ```java
                   .setSequencer(subscription.getSequencer())
 ```
+Since avery `asyncDelivery` *cannot* be blocking also in case of producer-slowdown backpressuring, the *sequencer* is
+a specific thread that is used to sequentially attempt the async deliveries. If not specified, a thread will be
+automatically created by the mailbox for this task. A sequencer can be safely shared among different
+ `BackpressuringMailbox` if required.
 ```java
                   .setRealMailboxOwner()
                   .build();
 ``` 
+The `ReActorContext` of the `ReActiveEntity` that is using this this mailbox.
+
+> NOTE: **ReActed** and `BackpressuringMailbox` are completely agnostic about the location of the sender of the messages.
+> This means that it can be used to automatically backpressure **remote** producers too
 
