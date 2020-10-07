@@ -11,7 +11,7 @@
     * [Kafka](drivers/kafka/kafka_main.md)
     * [Replay](drivers/replay/replay_main.md)
 * [Mailbox](mailboxes.md)
-* [Message sniffing](message_sniffing.md)
+* [Message subscriptions](subscriptions.md)
 * [Messaging](messaging.md)
 * [Patterns](patterns.md)
 * [Quick start](quickstart.md)
