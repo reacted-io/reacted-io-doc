@@ -9,6 +9,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/vue.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-dark-mode@latest/dist/style.min.css"/>
 </head>
 <body>
 <div id="app">Please wait...</div>
@@ -17,8 +18,26 @@
 	    loadSidebar: true,
 	    subMaxLevel: 3,
         repo:'https://github.com/reacted-io/reacted',
+
+        <!--  Dark mode configuration   -->
+        themeColor: "#34495e", // default 'vue' color
+        darkMode: {
+            dark: {
+                background: "#1c2022",
+                toggleBtnBg: "#34495e",
+                textColor: "#b4b4b4"
+              },
+              light: {
+                background: "white",
+                toggleBtnBg: "var(--theme-color)",
+                textColor: "var(--theme-color)"
+              }
+       },
+
     }
+
 </script>
 <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-dark-mode@latest/dist/index.min.js"></script>
 </body>
 </html>
