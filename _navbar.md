@@ -12,7 +12,6 @@
     <a href="https://www.reacted.io/contribute">CONTRIBUTE</a>&nbsp
     <a>&nbsp|&nbsp</a>
     <a href="https://www.reacted.io/contacts">CONTACTS</a>&nbsp
-    <a>&nbsp|&nbsp</a>
 </p>
 
 
