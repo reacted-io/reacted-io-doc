@@ -34,26 +34,37 @@ Tells a message to a destination. Its returned `CompletionStage` is going to be 
 > between source and destination. A delivery can fail (i.e. a [bounded mailbox](mailboxes.md#Bounded Mailbox) refuses the message,
 > but message cannot be lost on *local direct channels*. If you are looking for performances this is the way to go
 
-## ATell
+## Atell
 
-`aTell` stands for *acked tell*. With `aTell` delivery attempts will be marked as completed once the message has been
-acked by the destination. If the returned `Try<DeliveryStatus>` is a success, it provides delivery guarantee within the
-target's mailbox. `aTell` is automatically transformed into a `tell` on [local direct channels](drivers.md#Direct Channel),
+`atell` stands for *acked tell*. With `atell` delivery attempts will be marked as completed once the message has been
+acked by the destination. The destination acks a delivery request once a result for the operation is known. This means
+that if the destination is performing some kind of backpressuring on the delivery requests and the request is suspended,
+an ack will not be generated until the operation is completed, regardless of its result.
+Si, if the returned `Try<DeliveryStatus>` is a success, it provides delivery guarantee within the
+target's mailbox. `atell` is automatically transformed into a `tell` on [local direct channels](drivers.md#Direct Channel),
 so using it provides delivery guarantee or explicit failure regardless on the location or the [channel type](drivers.md) used to reach
-the recipient.
+the recipient. Since a remote peer may never complete the operation due to a crash, `atell` requests may be automatically
+completed with a `Failure` carrying a `TimeoutException`. 
 
 ## Reply
 `ReActorContext.reply` Tells a message to the sender of the last message received by the used `ReActorContext`. 
+
+## AReply
+
+`ReActorContext.areply` is the same as `ReActorContext.reply` but an `atell` is used instead of a `tell` for communication
+
 ## SelfTell
+
 `ReActorContext.selfTell` tells a message to the same reactor identified by the `ReActorContext` using itself as a
 source `ReActorRef`
+
 ## Ask
 
-All the above primitives can be used from within a `ReAction` scope. With `tell` and `aTell` we can communicate with a
+All the above primitives can be used from within a `ReAction` scope. With `tell` and `atell` we can communicate with a
 `ReActiveEntity` just having its reference, but it's a one way communication because unless we setup some `ReAction` we
 cannot get a reply.
 
-`ask` overcomes this limitation, allowing you to send one message to any `ReActiveEntity`and to asynchronously get a reply.
+`ask` overcomes this limitation, allowing you to send one message to any `ReActiveEntity` and to (a)synchronously get a reply.
 
 ```java <ReplyT extends Serializable, RequestT extends Serializable>
         CompletionStage<Try<ReplyT>> ask(RequestT request, Class<ReplyT> expectedReply, String requestName)
