@@ -1,10 +1,10 @@
 # Channel Drivers
 
-In `ReActed` communications are done over *channels*. A channel is defined as a pair of `ChannelId` and channel `Properties`.
+In ReActed communications are done over *channels*. A channel is defined as a pair of `ChannelId` and channel `Properties`.
 A `ChannelId` provides information about the `ChannelType` of the channel and its name, while channel `Properties` contain details
 about how to contact the reactor system over the defined channel.
 
-`ReActed` abstracts the communication over the channel concept, so as soon as there is a *channel driver* it means that
+ReActed abstracts the communication over the channel concept, so as soon as there is a *channel driver* it means that
 any communication schema or technology can be used. A *channel driver* provides a specific implementation about how to
 read or write from a certain medium type.
 
@@ -37,7 +37,7 @@ that were exchanged during a *recorded* session.
 A remote channel is a channel towards any other reactor system other than the current one. This means that if two reactor
 systems are on the same machine and within the same jvm instance, they can talk to each other using a remote channel.
 
-*Remoting* does not allow any special capability because `ReActed` aims to be *location agnostic*, it is a transparent layer
+*Remoting* does not allow any special capability because ReActed aims to be *location agnostic*, it is a transparent layer
 that allows communication towards/from reactors without taking care of the details.
 
 Differently from local channels, a reactor system can have as many remoting channels as wanted. Although this may be
