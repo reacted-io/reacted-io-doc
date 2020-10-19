@@ -27,9 +27,9 @@ A failed communication will not be automatically reattempted.
 ## Tell
 
 Tells a message to a destination. Its returned `CompletionStage` is going to be completed once the message has been
-*written* on the [communication channel](drivers.md#Channel Drivers).
+*written* on the [communication channel](channel_drivers/README.md).
 
-> NOTE: Implementation detail: on a [local direct channel](drivers.md#Direct Channel) a `tell` is always going to be
+> NOTE: Implementation detail: on a [local direct channel](channel_drivers/README.md#Direct Channels) a `tell` is always going to be
 > completed with the outcome of the delivery into the target's mailbox. This because there is no other medium than memory
 > between source and destination. A delivery can fail (i.e. a [bounded mailbox](mailboxes.md#Bounded Mailbox) refuses the message,
 > but message cannot be lost on *local direct channels*. If you are looking for performances this is the way to go
@@ -41,15 +41,15 @@ acked by the destination. The destination acks a delivery request once a result 
 that if the destination is performing some kind of backpressuring on the delivery requests and the request is suspended,
 an ack will not be generated until the operation is completed, regardless of its result.
 Si, if the returned `Try<DeliveryStatus>` is a success, it provides delivery guarantee within the
-target's mailbox. `atell` is automatically transformed into a `tell` on [local direct channels](drivers.md#Direct Channel),
-so using it provides delivery guarantee or explicit failure regardless on the location or the [channel type](drivers.md) used to reach
+target's mailbox. `atell` is automatically transformed into a `tell` on [local direct channels](channel_drivers/README.md#Direct Channels),
+so using it provides delivery guarantee or explicit failure regardless on the location or the [channel type](channel_drivers/README.md) used to reach
 the recipient. Since a remote peer may never complete the operation due to a crash, `atell` requests may be automatically
 completed with a `Failure` carrying a `TimeoutException`. 
 
 ## Reply
 `ReActorContext.reply` Tells a message to the sender of the last message received by the used `ReActorContext`. 
 
-## AReply
+## Areply
 
 `ReActorContext.areply` is the same as `ReActorContext.reply` but an `atell` is used instead of a `tell` for communication
 

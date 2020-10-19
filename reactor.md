@@ -233,7 +233,7 @@ With `getSender()` obtain the `ReActorRef` of the reactor that sent the current 
 another message to reply. `tell` returns a completion stage that is going to be completed with the outcome of the operation.
 It's not mandatory providing a check for the outcome of the operation, it highly depends on the logic of the application.
 ReActed guarantees that no message can be lost on `tell`, but this topic is covered in [messaging](messaging.md) and
-[drivers](drivers.md) chapters.
+[drivers](channel_drivers/README.md) chapters.
 ```java
                          .toCompletableFuture()
                          .thenAcceptAsync(deliveryStatus -> deliveryStatus.filter(DeliveryStatus::isDelivered)
