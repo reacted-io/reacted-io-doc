@@ -47,14 +47,6 @@ This means that if a reactor system wishes to talk over two different channels u
 two channel(driver) instances should be configured. Please note that a driver/channel configuration does **not** define
 how to talk with *other* reactor systems over that channel, but allows you to provide details about how the current reactor system
 can be contacted by **other** reactor systems over that `ChannelId`
-
-### Remoting
-
-ReActed automatically joins and discovers other nodes of the cluster using one or more [service registries](../registry_drivers/README.md).
-Every ReActed node publishes itself and the details about the supported `ChannelId`s on the known service registries.
-When any ReActed node wants to talk with a remote reactor, the `ChannelId`s supported by the remote peer are checked and
-if there is a match (a match means that also the local reactor system is registered for that `ChannelId`) the proper driver
-and the remote channel `Properties` are used to generate a route and communicate.
  
 
 
