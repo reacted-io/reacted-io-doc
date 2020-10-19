@@ -17,4 +17,5 @@ reproducing the exact execution flow that lead to a certain state, but deliverin
 received allowing them to reconstruct their state *indipendently* from the others' behavior. 
 It's not about recomputing the global state, but leaving all the reactors to recompute their own state using the input
 from messages and converging to a state globally equivalent to the original execution in a given moment in time.
+
   
