@@ -25,6 +25,10 @@ simply registering another local driver with the custom logic instead of the def
 
 From ReActed perspective it does not matter how or from where the messages are coming from, as long as a communication
 happens through messages it can be fully recorded from a local driver. This implies that also a communication with a database
-or with a remote web service can be logged and replayed whether [properly implemented](patterns.md#Database Replay) .     
+or with a remote web service can be logged and replayed whether [properly implemented](patterns.md#Database Replay).
+
+>> NOTE: What ReActed can do is replaying all the messages that were exchanged within a session. More your application
+>> is written in a event sourced style, more the replay feature becomes useful. More parts do not interact with ReActed
+>> messaging, more replay coverage you loose.
 
   
