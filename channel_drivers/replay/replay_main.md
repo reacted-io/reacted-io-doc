@@ -67,3 +67,14 @@ Black Widow and Loki executions are independent once they received the messages 
 
 ## Naming
 
+*Replay driver* behavior is about delivering messages in an appropriate order to reactors that are waiting for them.
+This means that it must be able to find the exact destination of a message within the [local reactor system](../../reactor_system.md).
+
+In the [reactors section](../../reactor.md) we learnt that a *spawned reactor* is uniquely targettable within a cluster
+through the location agnostic `ReActorRef`. One of the requirements for *spawning* a reactor, is providing a *reactor name*.
+
+*Replay driver* is the reason behind the advice of not choosing randomly generated reactor names: reactors with a randomly
+generated name have a different `ReActorRef` every time they are spawned, and in such a case the *replay driver* would not
+know where to send the messages from the log. The destination would not match.
+
+
