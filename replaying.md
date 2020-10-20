@@ -1,21 +1,30 @@
-# Replaying a recorded session
+# Session Replay Basics
 
-[Replay](channel_drivers/replay/replay_main.md) driver allows you to read the messages from a [recorded session](reactor_system.md#Session Recording)
-saved with the [chronicle queue](channel_drivers/cq/cq_main.md) [local driver](channel_drivers/README.md) and to feed with them your [reactor system](reactor_system.md).
+A [reactor system](reactor_system.md) can be configured to enable what is called *session recording*
+Session recording it's not about saving data in a specific format, it's about generating additional information 
+regarding the execution flow. These information will be emitted by the system under the form of `Message`. This means
+that all the extra information will pass through the [local channel](channel_drivers/README.md#Local Channels) that
+has been configured. Deciding what to do with those information it's completely up to the [local driver](channel_drivers/README.md).
 
-ReActed by design is a highly concurrent system with the meaning that every reactor has it own execution flow and all of them
-advance all together. There isn't a clearly defined total ordering of the executions within a reactor system: if you
-think about the dispatchers that can be multiple and multi threaded it's trivial that some actions can actually take place
-at the *same* time, but a recorded session globally grants the causal order and the total order per reactor.
+ReActed offers out of the box a [chronicle queue local driver](channel_drivers/cq/cq_main.md) that saves every message
+that passes through in the [chronicle queue format](https://github.com/OpenHFT/Chronicle-Queue). This low latency, low garbage
+and replay prone format allows to save all the binary data contained in the messages. 
+[Enabling session recording](reactor_system.md#Session Recording) and selecting the [chronicle queue local driver](channel_drivers/cq/cq_main.md) will result
+in saving all the messages and the information regarding their execution. 
 
-This means that ReActed can replicate the exact sequence of messages that a reactor **received** and only after that in
-the original execution they have been generated. 
+## How to replay a session
 
-That said, ReActed can sequentially feed the reactors if your system with the very same messages that were received
-during the recording phase and with the exact execution sequence that took place. Replaying a reactor system does not mean
-reproducing the exact execution flow that lead to a certain state, but delivering to all the reactors the messages that they
-received allowing them to reconstruct their state *indipendently* from the others' behavior. 
-It's not about recomputing the global state, but leaving all the reactors to recompute their own state using the input
-from messages and converging to a state globally equivalent to the original execution in a given moment in time.
+ReActed does not have a fixed replay engine, it has flexible driver model. From ReActed perspective replaying a session
+is about providing to the `ReActors` the messages that were received and executed during the a recorded session. Decoding
+a message and providing it to the destination `ReActor` is exactly what a [channel driver](channel_drivers/README.md) does.
+For this reason, ReActed offers the [local replay driver](channel_drivers/replay/replay_main.md). The *default* replay driver
+takes as input a recorded session and sends the recorded messages to the appropriate destinations in the appropriate order
+using the extra information that were generated while recording the session. 
+Since the provided replay driver is just a driver, if such approach should not be appropriate or should be customized,
+simply registering another local driver with the custom logic instead of the default one will do the work.
+
+From ReActed perspective it does not matter how or from where the messages are coming from, as long as a communication
+happens through messages it can be fully recorded from a local driver. This implies that also a communication with a database
+or with a remote web service can be logged and replayed whether [properly implemented](patterns.md#Database Replay) .     
 
   

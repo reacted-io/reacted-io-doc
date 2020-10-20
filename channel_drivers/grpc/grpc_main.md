@@ -1,3 +1,3 @@
-# GRPC
+# gRPC Driver
 
 GRPC driver details

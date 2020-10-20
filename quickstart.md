@@ -17,7 +17,8 @@ Always remember to init your reactor system once created
 
 ## Creating a ReActor
 
-Now you might want to create a reactor.
+Now you might want to create a reactor. We will do more: we will create a local [service](services.md) that provides
+the exact time and 
 
 ### Configuring a ReActor
 ### ReActions
