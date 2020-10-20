@@ -13,7 +13,6 @@
 * [Service Registry Drivers](registry_drivers/README.md)
     * [ZooKeeper](registry_drivers/zookeeper/zookeeper_main.md)    
 * [Mailbox](mailboxes.md)
-* [Message subscriptions](subscriptions.md)
 * [Messaging](messaging.md)
 * [Patterns](patterns.md)
 * [Quick start](quickstart.md)
