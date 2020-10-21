@@ -1,7 +1,7 @@
 # Quickstart
 
 If you are in a rush to be productive with ReActed and you do not need any detailed explanation, this section is for you. 
-I will show a quick setup that will allow you to start experimenting
+I will show a quick setup that will allow you to start experimenting.
 
 ## Creating a ReActorSystem
 
@@ -13,12 +13,17 @@ ReActorSystem showOffSystem = new ReActorSystem(ReActorSystemConfig.newBuilder()
                                                                    .setReactorSystemName("ShowOffReActorSystenName")
                                                                    .build()).initReActorSystem();
 ```
-Always remember to init your reactor system once created
+Always remember to init your reactor system once created.
 
 ## Creating a ReActor
 
-Now you might want to create a reactor. We will do more: we will create a local [service](services.md) that provides
-the exact time and 
+Now you might want to create a reactor. From ReActed perspective a `ReActor` is not a special entity, it's not even
+an entity to be fair. All what concerns ReActed are which `ReActions` should be called for a given type and some other
+information that are nicely modeled by `ReActorConfig` regarding the runtime behavior. The `ReActor` or `ReActiveEntity`
+interfaces are just a comfortable way to guide the user. You can *spawn* a reactor using the API call you prefer, but
+as long as you can provide some `ReActions` and a `ReActorConfig` you are fine.
+
+
 
 ### Configuring a ReActor
 ### ReActions

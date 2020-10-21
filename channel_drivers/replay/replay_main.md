@@ -45,21 +45,21 @@ The following two replayed executions are all valid:
 
 Execution 1:
 
-> Iron Man -> Hulk
-> Hulk -> Loki
-> Loky says "Yeeaaargh"
-> Thor -> Hulk
-> Hulk -> Black Widow
-> Black Widow says "Thanks!" 
+> Iron Man -> Hulk  
+> Hulk -> Loki  
+> Loky says "Yeeaaargh"  
+> Thor -> Hulk  
+> Hulk -> Black Widow  
+> Black Widow says "Thanks!"   
 
 Execution 2:
 
-> Iron Man -> Hulk
-> Thor -> Hulk
-> Hulk -> Loki
-> Hulk -> Black widow
-> Black Widow says "Thanks!"
-> Loki says "Yeeaaargh"
+> Iron Man -> Hulk  
+> Thor -> Hulk  
+> Hulk -> Loki  
+> Hulk -> Black widow  
+> Black Widow says "Thanks!"  
+> Loki says "Yeeaaargh"  
 
 Black widow can receive a message only after that it has been told to Hulk by Thor.
 Hulk processes the messages in the same order they were executed while recording the session.

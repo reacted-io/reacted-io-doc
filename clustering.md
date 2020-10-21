@@ -13,3 +13,4 @@ and the remote channel `Properties` are used to generate a route and communicate
 A remote channel identifies a logical channel. 
 
 ## Service Discovery
+
