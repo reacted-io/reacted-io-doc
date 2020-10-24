@@ -14,21 +14,23 @@ in saving all the messages and the information regarding their execution.
 
 ## How to replay a session
 
-ReActed does not have a fixed replay engine, it has flexible driver model. From ReActed perspective replaying a session
-is about providing to the `ReActors` the messages that were received and executed during the a recorded session. Decoding
-a message and providing it to the destination `ReActor` is exactly what a [channel driver](channel_drivers/README.md) does.
+What a [reaction](reactor.md) actually does is completely up to the provided code, so ReActed cannot replicate what
+took place within a *reaction*. For this reason  **ReActed does not have a fixed replay engine**, but instead it has flexible driver model. 
+From ReActed perspective replaying a session is about providing to the `ReActors` the messages that were executed during a recorded session. 
+Decoding a message and providing it to the destination `ReActor` is exactly what a [channel driver](channel_drivers/README.md) does.
 For this reason, ReActed offers the [local replay driver](channel_drivers/replay/replay_main.md). The *default* replay driver
 takes as input a recorded session and sends the recorded messages to the appropriate destinations in the appropriate order
 using the extra information that were generated while recording the session. 
-Since the provided replay driver is just a driver, if such approach should not be appropriate or should be customized,
-simply registering another local driver with the custom logic instead of the default one will do the work.
+Since the provided *replay driver* is just a driver, if such approach should not be appropriate or should be customized,
+simply registering another replay driver with the custom logic instead of the default one will do the work.
 
 From ReActed perspective it does not matter how or from where the messages are coming from, as long as a communication
 happens through messages it can be fully recorded from a local driver. This implies that also a communication with a database
-or with a remote web service can be logged and replayed whether [properly implemented](patterns.md#Database Replay).
+or with a remote web service can be logged and replayed whether [properly implemented](patterns.md#ReActor Factory).
 
->> NOTE: What ReActed can do is replaying all the messages that were exchanged within a session. More your application
->> is written in a event sourced style, more the replay feature becomes useful. More parts do not interact with ReActed
->> messaging, more replay coverage you loose.
+> NOTE: What ReActed can do is replaying all the messages that were exchanged within a session. More your application
+> is written in a event sourced style, more the replay feature becomes useful. More parts do not interact with ReActed
+> messaging, more replay coverage you loose. You can find a showoff implementation of a web app backend that interacts 
+> with web clients, microservices and a database in a fully replayable way in the examples [package](https://github.com/reacted-io/reacted/tree/master/examples/src/main/java/io/reacted/examples/webappbackend)
 
   
