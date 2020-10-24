@@ -8,9 +8,10 @@ saved with the [chronicle queue](../../channel_drivers/cq/cq_main.md) [local dri
 The word choice of the previous section has not been casual: ***replay driver* is about re-delivering the messages that were 
 recorded during a session recorded execution, is *not* about providing the same input and checking if the same output 
 is obtained.**. The only messages that are going to be delivered within a replayed session with the default *replay driver* 
-are the ones that were recorded. What *replay driver* does is delivering messages in an appropriate order to actors living 
-within the reactor system. It does not create reactors or reset the state of the system, it feeds messages to your
-application logic and prevents from delivering un-recorded messages. A realtime diff during replay is envisioned, but not yet implemented.  
+are the ones that were recorded and executed. What *replay driver* does is delivering messages in an appropriate order to actors living 
+within the reactor system. As described in the [replay section](../../replaying.md), it does not create reactors or reset 
+the state of the system, it feeds messages to your application logic and prevents from delivering un-recorded messages. 
+A realtime diff during replay is envisioned, but not yet implemented.  
 
 ## How it works
 
