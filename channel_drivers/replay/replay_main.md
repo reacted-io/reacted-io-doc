@@ -90,8 +90,6 @@ know where to send the messages from the log. The destination would not match.
 
 ## Replaying in practice
 
-In the [examples]https://github.com/reacted-io/reacted/tree/master/examples/src/main/java/io/reacted/examples/webappbackend
+In the [examples](https://github.com/reacted-io/reacted/tree/master/examples/src/main/java/io/reacted/examples/webappbackend)
 package is available a small example that shows how to build a system replaying-prone even if it depends on highly dynamic
-information such as web clients or external databases. Let's see the core concepts.
-
-
+information such as web clients or external databases.
