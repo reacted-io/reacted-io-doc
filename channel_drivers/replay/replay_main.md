@@ -23,7 +23,7 @@ not possible defining an exact and correct execution total order.
 
 > For this reason, *replay driver* does not embrace total ordering but a **causal** ordering. 
 > ReActed *replay driver* guarantees that a message is not going to be *replayed* before its place in the cause-effect
-> **flow** and is going to be replayed in the exact execution order of the reactor that receives it.
+> **flow of the original execution** and is going to be replayed in the exact execution order of the reactor that receives it.
 > **The replay is going to be *consistent* per flow basis and *exact* per reactor basis.**
 
 Execution flows that are not entwined might receive messages in a different **total** order from the original session,
@@ -32,39 +32,49 @@ but the replayed execution order is always going to be consistent per flow and e
 ### Example
 
 Let's see a quick example of the above rules. Let's say that we recorded an execution with 6 reactors. Since we are
-brave and we do not fear © infrigiments, let's call them with the name of some Åvengers.
+brave enough and we do not fear © infrigiments lawsuits, let's call them with the name of some Åvengers.
 
 In the first flow, Iron Man sends a message to Hulk, THEN Hulk sends a message to the poor Loki.
 
-> Iron Man -> Hulk -> Puny Loki. Loki receives the message and says "Yeeaaargh"
+```mermaid
+sequenceDiagram
+    participant Iron Man
+    participant Hulk
+    Iron Man->>Hulk: Ask Loki how he feels like
+    Hulk->>Loki: Hulk Smash!
+    loop Smashing
+        Loki->>Loki: Loki is being smashed
+    end
+    Loki->>Hulk: Yeeeargh!
+    Hulk->>Iron Man: He feels well
+```
 
 In the second flow, Thor sends a message to Hulk, THEN Hulk sends a message to Black Widow.
 
-> Thor -> Hulk -> Black Widow. Black widow receives the message and says "Thanks!"
+```mermaid
+sequenceDiagram
+    participant Thor
+    participant Hulk
+    Thor->>Hulk: Ask Black Widow how she feels like
+    Hulk->>Black Widow: Wanna date tonight?
+    Black Widow->>Hulk: Sure, why not?
+    Hulk->>Thor: She does not feel well
+```
 
-The following two replayed executions are all valid:
+The above two flows are not dependent on each other. This means that in [session recording](../../reactor_system.md#Session Recording) the messages
+of the two flows could have been registered interleaving one flow with the other. What is guaranteed is that any `ReActor`, let's say *Hulk* will
+always be replayed using the exact order of the messages that were **executed and not sent** during the recording phase.
 
-Execution 1:
+Long story short: due to the concurrency, the recorded send order is not totally but just causally guaranteed, but the
+execution order is per reactor guaranteed.
 
-> Iron Man -> Hulk  
-> Hulk -> Loki  
-> Loky says "Yeeaaargh"  
-> Thor -> Hulk  
-> Hulk -> Black Widow  
-> Black Widow says "Thanks!"   
-
-Execution 2:
-
-> Iron Man -> Hulk  
-> Thor -> Hulk  
-> Hulk -> Loki  
-> Hulk -> Black widow  
-> Black Widow says "Thanks!"  
-> Loki says "Yeeaaargh"  
-
-Black widow can receive a message only after that it has been told to Hulk by Thor.
-Hulk processes the messages in the same order they were executed while recording the session.
-Black Widow and Loki executions are independent once they received the messages they were waiting for.
+>NOTE: *Replay Driver* is about delivery messages in the execution order found from the recorded session, it has no
+>notion of delays. This means that while replaying a session, a `ReActor` might receive a response for something that
+>is still being computed. This does not violate the causality, because in replayed sessions no output is actually delivered,
+>so from the `ReActor` perspective everything is consistent. In the Loki-smashing example, this means that while replaying
+>a session, Iron Man could receive a reply from Hulk while **Loki `ReActor`** is still performing the smashing loop.
+>Is it a problem? Not as long `ReActors` talk to each other using messages, because the total ordering is controlled and
+>guaranteed by the recorded session and by the replay driver
 
 ## Naming
 
