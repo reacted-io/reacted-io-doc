@@ -92,4 +92,22 @@ know where to send the messages from the log. The destination would not match.
 
 In the [examples](https://github.com/reacted-io/reacted/tree/master/examples/src/main/java/io/reacted/examples/webappbackend)
 package is available a small example that shows how to build a system replaying-prone even if it depends on highly dynamic
-information such as web clients or external databases.
+information such as web clients or external databases. The core concept is the use of the [reactor factory](../../patterns.md#ReActor Factory) 
+pattern to overcome the [serialization constraint for messages](../../messaging.md) and the lack of non-replayable interaction
+with the system to replicate clients' requests. Replicating the database interaction luckily is much easier, it's all
+about bridling the response coming from the database into a message.
+
+```java
+        @Override
+        public void onNext(Document item) {
+            requester.tell(mongoGate, new StorageMessages.QueryReply(item.get(DatabaseService.PAYLOAD_FIELD)
+                                                                         .toString()))
+                     .thenAccept(delivery -> subscription.request(1));
+        }
+```
+
+In the above snippet we see how to do this: the [MongoDB driver used in the example](http://mongodb.github.io/mongo-java-driver/) returns
+a publisher to which we should subscribe in order to asynchronously read the replies from the database. All we need to do
+once we receive a reply, is *telling* the response towards the requester. While replaying a session, of course there will be
+no database, but what was returned from it in the original session will be within those messages. Database output consumer
+won't even notice the difference from being live and being replayed. 
