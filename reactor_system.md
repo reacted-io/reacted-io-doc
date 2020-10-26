@@ -9,19 +9,40 @@ to a reactor system. ReActors on different reactor systems can talk to each othe
 
 ## ReActorSystem structure
 
+A reactor system has some internal reactors as well. Those reactors are used for grouping omogeneous functionalities
+and abstracted behaviors in an ordered and easy controllable way. 
+
 ```mermaid
-graph System Hierarchy Structure
-    Init --> ReActor System Root
-    ReActor System Root --> System Remoting Root
-    ReActor System Root --> System ReActors Root
-    System ReActors Root --> DeadLetters
-    System ReActors Root --> System Monitor
-    System ReActors Root --> System Logger
-    ReActor System Root --> User ReActors Root
-    Note right of User ReActors Root: Every user defined reactor is going to be created below this point
+graph TD;
+    Init(Init) --> RSR(ReActor System Root);
+    RSR --> SRR(System Remoting Root);
+    SRR ---|One to many|ZK(ZooKeeper driver);
+    SRR -. One to many .-> SRD(...)
+    RSR --> SRAR(System ReActors Root);
+    SRAR --> DeadLetters(DeadLetters);
+    SRAR --> SM(System Monitor);
+    SRAR --> SL(System Logger);
+    RSR --> URR(User ReActors Root);
+    URR -. User defined ReActors .-> Any(...)
 ```
 
 ### System reactors
+
+From the above schema you might be interested into:
+
+**System Remoting Root**: Mediates the interaction of a [service registry driver](registry_drivers/README.md) with the reactor system.
+A [service registry driver](registry_drivers/zookeeper/zookeeper_main.md) should only interact with the service registry and this reactor, leaving it agnostic of the interaction of
+its notification with the framework internals 
+
+**DeadLetters**: All the messages that were sent but at the moment of the delivery was not possibile finding a valid recipient for them, will be rerouted toward
+this reactor. Its default behavior is simply logging, but if you need to intercept the messages that are rerouted towards *DeadLetter* you can just [subscribe](subscriptions.md)
+for the `DeadMessage.class` type.
+
+**System Monitor**: Periodically emits `SystemMonitorReport` containing statistics about the current system. At the moment of writing,
+these statistics include CPU load and free memory size extracted from `com.sun.management.OperatingSystemMXBean`
+
+**System Logger**: All the log messages generated with the `ReActorSystem log{info, debug, error}` calls will be routed
+towards this reactor
 
 ## Configure a ReActorSystem
 
