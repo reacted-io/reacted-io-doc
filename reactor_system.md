@@ -41,7 +41,7 @@ for the `DeadMessage.class` type.
 **System Monitor**: Periodically emits `SystemMonitorReport` containing statistics about the current system. At the moment of writing,
 these statistics include CPU load and free memory size extracted from `com.sun.management.OperatingSystemMXBean`
 
-**System Logger**: All the log messages generated with the `ReActorSystem log{info, debug, error}` calls will be routed
+**[System Logger](centralized_logger.md)**: All the log messages generated with the `ReActorSystem log{info, debug, error}` calls will be routed
 towards this reactor
 
 ## Configure a ReActorSystem
