@@ -30,18 +30,22 @@ graph TD;
 
 From the above schema you might be interested into:
 
-**System Remoting Root**: Mediates the interaction of a [service registry driver](registry_drivers/README.md) with the reactor system.
+###System Remoting Root 
+Mediates the interaction of a [service registry driver](registry_drivers/README.md) with the reactor system.
 A [service registry driver](registry_drivers/zookeeper/zookeeper_main.md) should only interact with the service registry and this reactor, leaving it agnostic of the interaction of
 its notification with the framework internals 
 
-**DeadLetters**: All the messages that were sent but at the moment of the delivery was not possibile finding a valid recipient for them, will be rerouted toward
+### DeadLetters
+All the messages that were sent but at the moment of the delivery was not possibile finding a valid recipient for them, will be rerouted toward
 this reactor. Its default behavior is simply logging, but if you need to intercept the messages that are rerouted towards *DeadLetter* you can just [subscribe](subscriptions.md)
 for the `DeadMessage.class` type.
 
-**System Monitor**: Periodically emits `SystemMonitorReport` containing statistics about the current system. At the moment of writing,
+### System Monitor**
+Periodically emits `SystemMonitorReport` containing statistics about the current system. At the moment of writing,
 these statistics include CPU load and free memory size extracted from `com.sun.management.OperatingSystemMXBean`
 
-**[System Logger](centralized_logger.md)**: All the log messages generated with the `ReActorSystem log{info, debug, error}` calls will be routed
+### [System Logger](centralized_logger.md)
+All the log messages generated with the `ReActorSystem log{info, debug, error}` calls will be routed
 towards this reactor
 
 ## Configure a ReActorSystem

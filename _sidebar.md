@@ -3,7 +3,6 @@
 * [Home](/)
 * [Centralized logger](centralized_logger.md)
 * [Clustering](clustering.md)
-* [Dead letters](dead_letters.md)
 * [Dispatcher](dispatcher.md)
 * [Channel Drivers](channel_drivers/README.md)
     * [Chronicle Queue](channel_drivers/cq/cq_main.md)
