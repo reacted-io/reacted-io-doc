@@ -40,7 +40,7 @@ All the messages that were sent but at the moment of the delivery was not possib
 this reactor. Its default behavior is simply logging, but if you need to intercept the messages that are rerouted towards *DeadLetter* you can just [subscribe](subscriptions.md)
 for the `DeadMessage.class` type.
 
-### System Monitor**
+### System Monitor
 Periodically emits `SystemMonitorReport` containing statistics about the current system. At the moment of writing,
 these statistics include CPU load and free memory size extracted from `com.sun.management.OperatingSystemMXBean`
 
