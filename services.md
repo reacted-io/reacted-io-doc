@@ -2,7 +2,7 @@
 
 A `Service` is a `ReActor` with some out of the box behaviors that allow to easily and reliably a [published](registry_drivers/README.md) functionality.
 This means that when publishing a `Service`, it will be automatically published on all the registered [service registries](channel_drivers/README.md), 
-it will be automatically made [discoverable](#Service Discovery), [searchable](#Finding a service), [updated](#Search Criteria) and [vertically scalable](#Routers).
+it will be automatically made [discoverable](#Service Discovery), [searchable](#Service Discovery), [updated](#Search Criteria) and [vertically scalable](#How a Service works).
 A `Service` acts like a one-stop-shop a certain `ReActor` has to be published, *locally* or [*remotely*](services.md#Remote Services).
 **Elastic horizontal scalability is planned, but not yet implemented.**  
 
@@ -10,7 +10,7 @@ A `Service` acts like a one-stop-shop a certain `ReActor` has to be published, *
 
 A `Service` acts as a message router. On creation, it [spawns](reactor.md) the configured number of **routees**. A routee is a `ReActor` whose
 behavior has been defined by the user while configuring the `Service` itself. So, a `Service` does not have any business related behavior,
-it only manages system tasks such as publication, [system statistics refresh](reactor_system.md#System Monitor), [discovery](#Finding a service), [load balancing](#Logical load balancing) 
+it only manages system tasks such as publication, [system statistics refresh](reactor_system.md#System Monitor), [discovery](#Service Discovery), [load balancing](#Logical load balancing) 
 and routee manteinance. Once a message is sent to a `Service`, it *routes* the message towards one if its routees, according to the
 configured load balancing policies.
 A `Service` always tries to keep its configuration enforced. If it has been configured for having **N** routees, they are spawned on `Service` creation.
@@ -27,9 +27,13 @@ Currently two logical load balancing policies are available: `Service.LoadBalanc
 ### Selection policies
 
 Given the described structure, where does a `Service` `ReActorRef` point to? To the container, the `Service` or to one of the *routees*?
-It depends on the `SelectionType`. Currently supported only for [local services](#Local services)
+It depends on the `SelectionType`. Currently supported only for [local services](#Local services), `SelectionType` allows you to
+specify if the `ReActorRef` that should be returned by a successful [service discovery](#Service Discovery) should be a direct reference
+to a routee (`SelectionType.DIRECT`) if you want to skip the extra hop with the risk to hammer on a overloaded routee, or instead a reference
+to the router (`SelectionType.ROUTED`) with the benefits of [load balancing](#Logical load balancing), [resiliency](#How a Service works) and
+[backpressuring](mailboxes.md#Backpressuring Mailbox) in case the `Service` has been configured to provide it. 
 
-## Finding a service
+## Service Discovery
 
 A service can be found because it reacts to `ServiceDiscoveryRequest` message. A [reactor system](reactor_system.md) offers out of the box
 two commodity methods for locating a service.
