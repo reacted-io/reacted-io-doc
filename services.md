@@ -2,7 +2,7 @@
 
 A `Service` is a `ReActor` with some out of the box behaviors that allow to easily and reliably a [published](registry_drivers/README.md) functionality.
 This means that when publishing a `Service`, it will be automatically published on all the registered [service registries](channel_drivers/README.md), 
-it will be automatically made [discoverable](#Service Discovery), [searchable](#Finding a service), [updated](#Service Statistics) and [vertically scalable](#Routers).
+it will be automatically made [discoverable](#Service Discovery), [searchable](#Finding a service), [updated](#Search Criteria) and [vertically scalable](#Routers).
 A `Service` acts like a one-stop-shop a certain `ReActor` has to be published, *locally* or [*remotely*](services.md#Remote Services).
 **Elastic horizontal scalability is planned, but not yet implemented.**  
 
@@ -23,6 +23,11 @@ Currently two logical load balancing policies are available: `Service.LoadBalanc
 
 `ROUND_ROBIN` policy will route every new message towards a different *routee* from the one chosen for the previous message sent to the `Service`.
 `LOWEST_LOAD` policy will route every new messages towards the routee with the lowest number of messages in its mailbox.
+
+### Selection policies
+
+Given the described structure, where does a `Service` `ReActorRef` point to? To the container, the `Service` or to one of the *routees*?
+It depends on the `SelectionType`. Currently supported only for [local services](#Local services)
 
 ## Finding a service
 
@@ -87,14 +92,6 @@ public final Builder setSelectionType(SelectionType selectionType)
 
 A local `Service` is a service that is going to expose its functionalities only whithin the [reactor system](reactor_system.md) where it has been created.
 
-
-## Selection policies
-
-## Service Discovery
-
-### Service Filtering
-
-#### Service Statistics
 
 ## Backpressured service
 
