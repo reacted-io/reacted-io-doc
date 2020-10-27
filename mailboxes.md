@@ -34,6 +34,9 @@ with the difference that any ```java public CompletionStage<Try<DeliveryStatus>>
 *always* asynchronously completed. Chaining actions on the returned `CompletionStage` has the effect to execute them
 once the delivery attempt has been completed, so after that the backpressure had taken place.
 
+> NOTE: When using Backpressuring mailbox, you must explicitly communicate when you can receive other messages, exactly
+> how you would do with [Reacted Streams](reacted_streams.md) and [Java Flow Subscription - request](https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/Flow.Subscription.html#request-long-)
+
 ### Backpressuring Mailbox Configuration
 
 This mailbox is pretty flexible, let's see an example taken from [reacted streams](reacted_streams.md) implementation:

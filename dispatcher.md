@@ -9,10 +9,29 @@ that caused it. Dispatchers process a configurable amount of messages from a giv
 cpu to another reactor. Changing this value can result in increasing the throughput or increasing the reactiveness
 of the system.
 Since the dispatcher is the computing core component of **ReActed** it is **mandatory** that it never blocks.
-All the operations that could block should be done asynchronously from the [reactors perspective](patterns.md#Dedicated dispatcher for blocking operations).
+All the operations that could block should be done asynchronously from the [reactors perspective](patterns.md#Managing blocking operations).
 **ReActed** provides a default dispatcher called `ReactorSystemDispatcher`. A `ReActorSystem` can be configured to hold
 different dispatchers with different configurations and through a `ReActiveEntityConfig` we can specify which dispatcher
 should be used for a given reactor or [service](services.md). A dispatcher name must be unique within a `ReActorSystem`.
+
+## How it works
+
+Here it is a small diagram of how a dispatcher works
+
+```mermaid
+graph LR;
+    RR(ReActorRef) -->|tell|LD(Local Driver);
+    LD -->|delivery|RM(ReActor Mailbox);
+    LD -->|Schedule|D{Is this ReActor already scheduled?};
+    D -->|Yes|Finish(End); 
+    D -->|No|DH(Add reactor to dispatcher queue);
+    DH --->DL(Dispatcher Loop);
+    DL -->|Poll next ReActor|DL;
+    EL -->|Read next message|RM;
+    DL -->|Execution Loop| EL(Execute till possible);
+    EL --> ReAct(Re-action!);
+```
+
 
 ## Configuration
 

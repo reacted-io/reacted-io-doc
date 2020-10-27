@@ -35,7 +35,8 @@ configuration
 >NOTE: A reactor termination has a top down behavior: once a reactor has been terminated, all its children will be
 >recursively terminated as well. The ratio behind this is that a child can be terminated when there is nothing waiting 
 >for it, otherwise we could kill something required by a still operating father reactor. *The termination will be 
->considered and marked as completed when the whole hierarchy has been terminated*.  
+>considered and marked as completed when the whole hierarchy has been terminated*, so after that the CompletionStage
+>returned by `stop` is completed
 
 ## Creating a ReActor
 
@@ -233,7 +234,7 @@ With `getSender()` obtain the `ReActorRef` of the reactor that sent the current 
 another message to reply. `tell` returns a completion stage that is going to be completed with the outcome of the operation.
 It's not mandatory providing a check for the outcome of the operation, it highly depends on the logic of the application.
 ReActed guarantees that no message can be lost on `tell`, but this topic is covered in [messaging](messaging.md) and
-[drivers](drivers.md) chapters.
+[drivers](channel_drivers/README.md) chapters.
 ```java
                          .toCompletableFuture()
                          .thenAcceptAsync(deliveryStatus -> deliveryStatus.filter(DeliveryStatus::isDelivered)
