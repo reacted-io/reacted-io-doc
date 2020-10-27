@@ -80,7 +80,7 @@ Defines which [local driver](channel_drivers/README.md) should be used for the l
 ```
 [Services](services.md) by default receive information about the status of the current system. This because in this way
 they can publish such statistics on a [service registry](registry_drivers/README.md) and service discovery queries based
-on those values can be performed. This option specifies how often those statistics should be refreshed.
+on those values can be performed. This option specifies how often those statistics should be refreshed by the [system monitor](#System Monitor)
 
 ```java
  public Builder addDispatcherConfig(DispatcherConfig dispatcherConfig)
