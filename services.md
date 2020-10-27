@@ -95,8 +95,11 @@ public final Builder setSelectionType(SelectionType selectionType)
 ## Local Services
 
 A local `Service` is a service that is going to expose its functionalities only whithin the [reactor system](reactor_system.md) where it has been created.
-
+If it is envisioned the use of just *local services*, specifying a [service registry driver](registry_drivers/README.md) is not required. 
 
 ## Backpressured service
+
+A `Service` can automatically benefit of the backpressuring features provided by ReActed if a [backpressuring mailbox](mailboxes.md#Backpressuring Mailbox)
+is specified in its configuration.
 
 ## Remote Services
