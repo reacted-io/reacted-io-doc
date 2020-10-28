@@ -108,6 +108,6 @@ is specified in its configuration.
 A service can be *published* just using `ServiceConfig.Builder::setIsRemoteService(boolean remoteService)`. If set to `true`, this triggers
 the publication of the service on the [available service registries](registry_drivers/README.md). Such a subscription is refreshed [periodically](reactor_system.md#Configure a ReActorSystem).
 A `Service` is published on a specific [channel](channel_drivers/README.md), so a `Service` is going to be published for [all the channels available](channel_drivers/README.md#Remote Channels) from the publishing reactor system.
-
+If a `Service` should be terminated, it automatically withdraws from the cluster.
 
 
