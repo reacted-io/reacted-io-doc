@@ -11,7 +11,7 @@ A `Service` acts like a one-stop-shop a certain `ReActor` has to be published, *
 A `Service` acts as a message router. On creation, it [spawns](reactor.md) the configured number of **routees**. A routee is a `ReActor` whose
 behavior has been defined by the user while configuring the `Service` itself. So, a `Service` does not have any business related behavior,
 it only manages system tasks such as publication, [system statistics refresh](reactor_system.md#System Monitor), [discovery](#Service Discovery), [load balancing](#Logical load balancing) 
-and routee manteinance. Once a message is sent to a `Service`, it *routes* the message towards one if its routees, according to the
+and routee maintenance. Once a message is sent to a `Service`, it *routes* the message towards one if its routees, according to the
 configured load balancing policies.
 A `Service` always tries to keep its configuration enforced. If it has been configured for having **N** routees, they are spawned on `Service` creation.
 If any of those routees should stop for any reason, the `Service` will recognize such a situation and will attempt to re-spawn as many routee as required
@@ -19,7 +19,7 @@ to be consistent with its configuration.
 
 ### Logical load balancing
 
-Currently two logical load balancing policies are available: `Service.LoadBalancingPolicy.ROUND_ROBIN` and `Service.LoadBalancingPolicy.LOWEST_LOAD`.
+Currently, two logical load balancing policies are available: `Service.LoadBalancingPolicy.ROUND_ROBIN` and `Service.LoadBalancingPolicy.LOWEST_LOAD`.
 
 `ROUND_ROBIN` policy will route every new message towards a different *routee* from the one chosen for the previous message sent to the `Service`.
 `LOWEST_LOAD` policy will route every new messages towards the routee with the lowest number of messages in its mailbox.

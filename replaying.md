@@ -2,7 +2,7 @@
 
 A [reactor system](reactor_system.md) can be configured to enable what is called *session recording*
 Session recording it's not about saving data in a specific format, it's about generating additional information 
-regarding the execution flow. These information will be emitted by the system under the form of `Message`. This means
+regarding the execution flow. This information will be emitted by the system under the form of `Message`. This means
 that all the extra information will pass through the [local channel](channel_drivers/README.md#Local Channels) that
 has been configured. Deciding what to do with those information it's completely up to the [local driver](channel_drivers/README.md).
 

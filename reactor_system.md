@@ -44,9 +44,11 @@ for the `DeadMessage.class` type.
 Periodically emits `SystemMonitorReport` containing statistics about the current system. At the moment of writing,
 these statistics include CPU load and free memory size extracted from `com.sun.management.OperatingSystemMXBean`
 
-### [System Logger](centralized_logger.md)
+### System Logger 
 All the log messages generated with the `ReActorSystem log{info, debug, error}` calls will be routed
 towards this reactor
+
+[Check Centralized logger documentation](centralized_logger.md)
 
 ## Configure a ReActorSystem
 
@@ -61,8 +63,8 @@ be unique within a cluster.
 ```java
  public Builder setMsgFanOutPoolSize(int msgFanOutPoolSize)
 ```
-Every time a message is sent to a `ReActor` within the `ReActorSystem` a fan out process take place. This fan out process
-is responsible for delivering messages to [typed subscribers](subscriptions.md). This parameter define how many threads
+Every time a message is sent to a `ReActor` within the `ReActorSystem` a fan out process takes place. This fan out process
+is responsible for delivering messages to [typed subscribers](subscriptions.md). This parameter defines how many threads
 there are in the thread pool used for the fan out.
 
 ```java
