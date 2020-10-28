@@ -30,7 +30,7 @@ graph TD;
 
 From the above schema you might be interested into:
 
-###System Remoting Root 
+### System Remoting Root 
 Mediates the interaction of a [service registry driver](registry_drivers/README.md) with the reactor system.
 A [service registry driver](registry_drivers/zookeeper/zookeeper_main.md) should only interact with the service registry and this reactor, leaving it agnostic of the interaction of
 its notification with the framework internals 
