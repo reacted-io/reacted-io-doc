@@ -95,6 +95,7 @@ public final Builder setSelectionType(SelectionType selectionType)
 ## Local Services
 
 A local `Service` is a service that is going to expose its functionalities only whithin the [reactor system](reactor_system.md) where it has been created.
+If not specified [otherwise](#Remote Services) this is the default behaviour.
 If it is envisioned the use of just *local services*, specifying a [service registry driver](registry_drivers/README.md) is not required. 
 
 ## Backpressured service
@@ -103,3 +104,10 @@ A `Service` can automatically benefit of the backpressuring features provided by
 is specified in its configuration.
 
 ## Remote Services
+
+A service can be *published* just using `ServiceConfig.Builder::setIsRemoteService(boolean remoteService)`. If set to `true`, this triggers
+the publication of the service on the [available service registries](registry_drivers/README.md). Such a subscription is refreshed [periodically](reactor_system.md#Configure a ReActorSystem).
+A `Service` is published on a specific [channel](channel_drivers/README.md), so a `Service` is going to be published for [all the channels available](channel_drivers/README.md#Remote Channels) from the publishing reactor system.
+
+
+

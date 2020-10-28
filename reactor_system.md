@@ -96,7 +96,7 @@ Allows you to register a new [remoting channel](channel_drivers/README.md). A ne
 
 ```java
  public Builder addServiceRegistryDriver(ServiceRegistryDriver<? extends ServiceRegistryConfig.Builder<?, ?>,
-                                         ? extends ServiceRegistryConfig<?, ?>> serviceRegistryDriver)
+                                                               ? extends ServiceRegistryConfig<?, ?>> serviceRegistryDriver)
 ```
 Allows to register a new [service registry](registry_drivers/README.md) driver. A new driver should be registered for
 each new configuration of every different [service registry type](registry_drivers/zookeeper/zookeeper_main.md)
