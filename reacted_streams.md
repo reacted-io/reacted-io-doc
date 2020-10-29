@@ -88,7 +88,7 @@ Or if we are picky, we can specify anything:
                                           .setSequencer(sharedSequencer)
                                           .build())
 ```
-Using a shared sequencer and a shared async backpressurer executor service (such as `ForkJoin.commonPool()`) will expose the implementation 
+Using a shared sequencer and a shared async backpressurer executor service (such as `ForkJoinPool.commonPool()`) will expose the implementation 
 to cross local subscribers delays, but will not create any additional overhead due to excessive thread creation. This could be a strategy
 to use when the number of subscribers within a single ReActed node should be high.
 
@@ -98,10 +98,15 @@ If we want to use the standard interface that does not take in account the data 
 
 ```java streamPublisher.submit(ANY_INTEGER);```
 
-Otherwise, if we want our flow to be automatically regulated according to the speed of the non-best effort consumers, we can do like this:
+Otherwise, if we want our flow to be automatically regulated according to the speed of the non-best effort consumers, we can do something like this:
 
-
-
+```java
+ AtomicInteger counter = new AtomicInteger(1);
+ CompletaionStage<Void operationComplete = AsyncUtils.asyncLoop(noValue -> streamPublisher.backpressurableSubmit(counter.getAndIncrement()), 
+                                                                null, (Void)null, REQUESTS_NUM);
+```
+A new submission will be *sequentially* attempted once a result (delivery or drop) for the previous one from all the subscribers, is known. `REQUESTS_NUM` iteration will take
+place. The call is non blocking and the returned `CompletionStage` will be marked as completed once all the attempts have taken place.
 
 ## Stream Graphs
 
