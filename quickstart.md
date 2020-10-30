@@ -3,15 +3,24 @@
 If you are in a rush to be productive with ReActed and you do not need any detailed explanation, this section is for you. 
 I will show a quick setup that will allow you to start experimenting.
 
+As first thing, download the latest version of ReActed from [maven repository](https://mvnrepository.com/artifact/io.reacted/reacted-framework)
+
 ## Creating a ReActorSystem
 
 ReActors live within a ReActorSystem, so the first thing to do is creating one. The very least thing that you can specify
 for a [reactor system](reactor_system.md) is its name. Remember, a reactor system name **must be unique** in a cluster.
 
 ```java
-ReActorSystem showOffSystem = new ReActorSystem(ReActorSystemConfig.newBuilder()
-                                                                   .setReactorSystemName("ShowOffReActorSystenName")
-                                                                   .build()).initReActorSystem();
+import io.reacted.core.config.reactorsystem.ReActorSystemConfig;
+import io.reacted.core.reactorsystem.ReActorSystem;
+
+public class Quickstart {
+    public static void main(String[] args) {
+        ReActorSystem showOffSystem = new ReActorSystem(ReActorSystemConfig.newBuilder()
+                                                                           .setReactorSystemName("ShowOffReActorSystenName")
+                                                                           .build()).initReActorSystem();
+    }
+}
 ```
 Always remember to init your reactor system once created.
 
@@ -23,8 +32,297 @@ information that are nicely modeled by `ReActorConfig` regarding the runtime beh
 interfaces are just a comfortable way to guide the user. You can *spawn* a reactor using the API call you prefer, but
 as long as you can provide some `ReActions` and a `ReActorConfig` you are fine.
 
+For this quickstart guide, let's create a `Hello World` reactor that greets the caller when receives a `GreetingsRequest` message.
+
+```java
+    private static final class Greeter implements ReActiveEntity {
+        @Nonnull
+        @Override
+        public ReActions getReActions() {
+            return ReActions.newBuilder()
+                            .reAct(ReActorInit.class,
+                                   ((reActorContext, init) -> reActorContext.logInfo("A reactor was born")))
+                            .reAct(GreetingsRequest.class,
+                                   ((raCtx, greetingsRequest) -> raCtx.reply("Hello from " +
+                                                                             Greeter.class.getSimpleName())))
+                            .build();
+        }
+    }
+    private static final class GreetingsRequest implements Serializable { }
+``` 
+
+Putting it all together and *spawning* the above `ReActivEntity` then becomes like this:
+
+```java
+import io.reacted.core.config.reactors.ReActorConfig;
+import io.reacted.core.config.reactorsystem.ReActorSystemConfig;
+import io.reacted.core.messages.reactors.ReActorInit;
+import io.reacted.core.reactors.ReActions;
+import io.reacted.core.reactors.ReActiveEntity;
+import io.reacted.core.reactorsystem.ReActorRef;
+import io.reacted.core.reactorsystem.ReActorSystem;
+
+import javax.annotation.Nonnull;
+import java.io.Serializable;
+
+public class Quickstart {
+    public static void main(String[] args) {
+        ReActorSystem showOffSystem = new ReActorSystem(ReActorSystemConfig.newBuilder()
+                                                                           .setReactorSystemName("ShowOffReActorSystenName")
+                                                                           .build()).initReActorSystem();
+        try {
+            ReActorRef greeter = showOffSystem.spawn(new Greeter(), 
+                                                     ReActorConfig.newBuilder()
+                                                                  .setReActorName("Greeter")
+                                                                  .build()).orElseSneakyThrow();
+        } catch (Exception anyException) {
+            anyException.printStackTrace();
+        }
+        showOffSystem.shutDown();
+    }
+
+    private static final class Greeter implements ReActiveEntity {
+        @Nonnull
+        @Override
+        public ReActions getReActions() {
+            return ReActions.newBuilder()
+                            .reAct(ReActorInit.class,
+                                   ((reActorContext, init) -> reActorContext.logInfo("A reactor was born")))
+                            .reAct(GreetingsRequest.class,
+                                   ((raCtx, greetingsRequest) -> raCtx.reply("Hello from " +
+                                                                             Greeter.class.getSimpleName())))
+                            .build();
+        }
+    }
+    private static final class GreetingsRequest implements Serializable { }
+}
+```
+If we should try to run the above example, we would get the following output
+
+```text
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - A reactor was born
+
+Process finished with exit code 0
+```
+## Querying a ReActor
+
+We said that we wanted our reactor to answer to some requests. We can query a reactor *asking* for something or letting
+it talking freely with another `ReActor`. Let's `ask` for a greet as first thing:
+
+```java
+greeter.ask(new GreetingsRequest(), String.class, "Introduction request")
+       .toCompletableFuture()
+       .join()
+       .ifSuccessOrElse(showOffSystem::logInfo, Throwable::printStackTrace);
+```
+[Ask](messaging.md#Ask) allows to receive a message from a `ReActor` from outside the scope of a [ReAction](reactor.md)
+
+Adding the above request just after the raction creation and running the program, the output becomes:
+
+```text
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - A reactor was born
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Hello from Greeter
+
+Process finished with exit code 0
+```
+
+## Greetings service
+
+Now let's transform this `Greeter` into a [Service](services.md). As a service it can be [discovered](services.md#Service Discovery)
+and queried without previously having its `ReActorRef`, like we did in the example above.
+
+```java
+import io.reacted.core.config.reactors.ReActorConfig;
+import io.reacted.core.config.reactors.TypedSubscriptionPolicy;
+import io.reacted.core.config.reactorsystem.ReActorSystemConfig;
+import io.reacted.core.messages.reactors.ReActorInit;
+import io.reacted.core.messages.services.ServiceDiscoveryRequest;
+import io.reacted.core.reactors.ReActions;
+import io.reacted.core.reactors.ReActor;
+import io.reacted.core.reactorsystem.ReActorSystem;
+import io.reacted.core.reactorsystem.ServiceConfig;
+
+import javax.annotation.Nonnull;
+import java.io.Serializable;
+
+public class Quickstart {
+    public static void main(String[] args) {
+        ReActorSystem showOffSystem = new ReActorSystem(ReActorSystemConfig.newBuilder()
+                                                                           .setReactorSystemName("ShowOffReActorSystenName")
+                                                                           .build()).initReActorSystem();
+        try {
+            String serviceName = "Greetings";
+            showOffSystem.spawnService(ServiceConfig.newBuilder()
+                                                    .setReActorName(serviceName)
+                                                    .setRouteesNum(2)
+                                                    .setRouteeProvider(Greeter::new)
+                                                    .build()).orElseSneakyThrow();
+        } catch (Exception anyException) {
+            anyException.printStackTrace();
+        }
+        showOffSystem.shutDown();
+    }
+
+    private static final class Greeter implements ReActor {
+
+        @Nonnull
+        @Override
+        public ReActorConfig getConfig() {
+            return ReActorConfig.newBuilder()
+                                .setReActorName("Worker")
+                                .build();
+        }
+
+        @Nonnull
+        @Override
+        public ReActions getReActions() {
+            return ReActions.newBuilder()
+                            .reAct(ReActorInit.class,
+                                   ((reActorContext, init) -> reActorContext.logInfo("A reactor was born")))
+                            .reAct(GreetingsRequest.class,
+                                   ((raCtx, greetingsRequest) -> raCtx.reply("Hello from " +
+                                                                             Greeter.class.getSimpleName())))
+                            .build();
+        }
+    }
+    private static final class GreetingsRequest implements Serializable { }
+}
+```
+
+Notice that we changed the [service replica factor](services.md#How a Service works) to `2`. For this reason, the
+output of the above program is
+
+```text
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.reactors.systemreactors.SystemLogger - A reactor was born
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.reactors.systemreactors.SystemLogger - A reactor was born
+
+Process finished with exit code 0
+```
+
+## Querying Greetings Service
+
+For querying a `Service` a `ReActorRef` is required. We must then make it *discoverable* allowing it to receive to [service discovery](services.md#Service Discovery) requests.
+
+```java
+.setTypedSubscriptions(TypedSubscriptionPolicy.LOCAL.forType(ServiceDiscoveryRequest.class))
+```
+Just adding a [local subscription](subscriptions.md#Local Subscription) for the `ServiceDiscoveryRequest` message type is enough.
+
+For discovering it we simply define a [search filter](services.md#Search Criteria) and perform a search:
+
+```java
+    public static void main(String[] args) {
+        ReActorSystem showOffSystem = new ReActorSystem(ReActorSystemConfig.newBuilder()
+                                                                           .setReactorSystemName("ShowOffReActorSystenName")
+                                                                           .build()).initReActorSystem();
+        try {
+            String serviceName = "Greetings";
+            showOffSystem.spawnService(ServiceConfig.newBuilder()
+                                                    .setReActorName(serviceName)
+                                                    .setRouteesNum(2)
+                                                    .setTypedSubscriptions(TypedSubscriptionPolicy.LOCAL.forType(ServiceDiscoveryRequest.class))
+                                                    .setRouteeProvider(Greeter::new)
+                                                    .build())
+                         .orElseSneakyThrow();
+
+            var searchFilter = BasicServiceDiscoverySearchFilter.newBuilder()
+                                                                .setServiceName(serviceName)
+                                                                .build();
+            var serviceDiscoveryReply = showOffSystem.serviceDiscovery(searchFilter)
+                                                     .toCompletableFuture()
+                                                     .join()
+                                                     .orElseSneakyThrow();
+            
+            if (serviceDiscoveryReply.getServiceGates().isEmpty()) {
+                showOffSystem.logInfo("No services found, exiting");
+            } else {
+                var serviceGate = serviceDiscoveryReply.getServiceGates().iterator().next();
+                serviceGate.ask(new GreetingsRequest(), String.class, "Request to service")
+                           .toCompletableFuture()
+                           .join()
+                           .ifSuccessOrElse(showOffSystem::logInfo, Throwable::printStackTrace);
+            }
+        } catch (Exception anyException) {
+            anyException.printStackTrace();
+        }
+        showOffSystem.shutDown();
+    }
+``` 
+
+We made it synchronous for clarity, but could have been done with an async pipeline.
+Using the `Greeter` `ReActor` from above,  output of this above program is:
+
+```text
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - A reactor was born
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - A reactor was born
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Hello from Greeter
+
+Process finished with exit code 0
+```
+## Publishing Greetings Service on a cluster
+
+The only thing that ReActed needs for clustering is a [service registry driver](registry_drivers/README.md) and a [channel](channel_drivers/README.md) for
+communicating with other [reactor systems](reactor_system.md). Let's publish `Greetings` service on a cluster over Kafka.
+
+You can quickly setup a Kafka instance using [this tutorial](https://kafka.apache.org/quickstart).
+
+> NOTE: ReActed [ZooKeeper driver](registry_drivers/zookeeper/zookeeper_main.md) is compatible ONLY with ZooKeeper 3.6+ 
+
+Once Kafka it's up and running we need to:
+ - setup [ZooKeeper server registry driver](registry_drivers/zookeeper/zookeeper_main.md). 
+ - setup [kafka channel driver](channel_drivers/kafka/kafka_main.md)
+ - marke the `Service` as remotely discoverable
+
+```java
+    public static void main(String[] args) {
+        var zooKeeperDriverConfig = ZooKeeperDriverConfig.newBuilder()
+                                                         .setReActorName("LocalhostCluster")
+                                                         .setTypedSubscriptions(TypedSubscriptionPolicy.LOCAL.forType(ServiceDiscoveryRequest.class))
+                                                         .build();
+        var kafkaDriverConfig = KafkaDriverConfig.newBuilder()
+                                                 .setChannelName("KafkaQuickstartChannel")
+                                                 .setTopic("ReactedTopic")
+                                                 .setGroupId("QuickstartGroup")
+                                                 .setMaxPollRecords(1)
+                                                 .setBootstrapEndpoint("localhost:9092")
+                                                 .build();
+        ReActorSystem showOffSystem = new ReActorSystem(ReActorSystemConfig.newBuilder()
+                                                                           .addServiceRegistryDriver(new ZooKeeperDriver(zooKeeperDriverConfig))
+                                                                           .addRemotingDriver(new KafkaDriver(kafkaDriverConfig))
+                                                                           .setReactorSystemName("ShowOffReActorSystenName")
+                                                                           .build()).initReActorSystem();
+        try {
+            String serviceName = "Greetings";
+            showOffSystem.spawnService(ServiceConfig.newBuilder()
+                                                    .setReActorName(serviceName)
+                                                    .setRouteesNum(2)
+                                                    .setRouteeProvider(Greeter::new)
+                                                    .setIsRemoteService(true)
+                                                    .build())
+                         .orElseSneakyThrow();
+            TimeUnit.SECONDS.sleep(10);
+        } catch (Exception anyException) {
+            anyException.printStackTrace();
+        }
+        showOffSystem.shutDown();
+    }
+```
+
+Launching it after all the log lines from Zookeeper and Kafka drivers, we get
+
+```text
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Service Greetings published
+```
+It's perfectly normal seeing more lines like this, it's the [system monitor](reactor_system.md#System Monitor) that is refreshing the service statistics
+and the [remoting root reactor](reactor_system.md#System Remoting Root) propagates these information towards the [service registry drivers](registry_drivers/README.md) that
+*react* refreshing the publications.
+
+## Querying a published service
+
+ 
 
 
-### Configuring a ReActor
-### ReActions
 
+
+
+ 

@@ -56,17 +56,23 @@ var streamPublisher = new ReactedSubmissionPublisher<Integer>(reactorSystem, "Te
 ```
 Then, given a `Flow.Subscriber<Integer>` named `SUBSCRIBER-$(N)` with N integer, we can subscribe for best effort updates:
 
-```java streamPublisher.subscribe(SUBSCRIBER-1);```
+```java 
+streamPublisher.subscribe(SUBSCRIBER-1);
+```
 
 Note that as said above, with this overload the stream is not going to be [replayable](replaying.md) and a new *sequencer* thread will be created per subscription.
 
 Let's create a *replayable*, *best effort* subscription now:
 
-```java streamPublisher.subscribe(SUBSCRIBER-2, "Best effort replayable subscription 2);```
+```java 
+streamPublisher.subscribe(SUBSCRIBER-2, "Best effort replayable subscription 2);
+```
 
 While for creating a *reliable*, *replayable* subscription:
 
-```java streamPublisher.subscribe(SUBSCRIBER-3, ReactedSubmissionPublisher.RELIABLE_SUBSCRIPTION, "Reliable and replayable subscription")```
+```
+java streamPublisher.subscribe(SUBSCRIBER-3, ReactedSubmissionPublisher.RELIABLE_SUBSCRIPTION, "Reliable and replayable subscription")
+```
 
 Or if we are picky, we can specify anything:
 
