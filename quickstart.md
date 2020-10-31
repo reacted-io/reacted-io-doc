@@ -463,5 +463,23 @@ Assuming a working Kafka setup, we launch the server and then the client. In cli
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-0] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Hello from GreeterService
 ```
 
+## Backpressuring
+
+Since everyone would obviously be interested in such a service, we must think about backpressuring.
+Changing the mailbox provider of the `Service` like this
+
+```java
+.setMailBoxProvider(BackpressuringMbox::newDefaultMailBox)
+```
+
+would automatically start [dropping requests](mailboxes.md#Backpressuring Mailbox) if the service cannot keep up with them.
+
+## Remote message subscription
+
+
+
+
+                                                          
+
 
  
