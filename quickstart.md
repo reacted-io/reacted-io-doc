@@ -277,7 +277,6 @@ Once Kafka it's up and running we need to:
     public static void main(String[] args) {
         var zooKeeperDriverConfig = ZooKeeperDriverConfig.newBuilder()
                                                          .setReActorName("LocalhostCluster")
-                                                         .setTypedSubscriptions(TypedSubscriptionPolicy.LOCAL.forType(ServiceDiscoveryRequest.class))
                                                          .build();
         var kafkaDriverConfig = KafkaDriverConfig.newBuilder()
                                                  .setChannelName("KafkaQuickstartChannel")
@@ -327,10 +326,12 @@ import io.reacted.core.config.reactors.ReActorConfig;
 import io.reacted.core.messages.reactors.ReActorInit;
 import io.reacted.core.reactors.ReActions;
 import io.reacted.core.reactors.ReActor;
+import io.reacted.patterns.NonNullByDefault;
 
 import javax.annotation.Nonnull;
 import java.io.Serializable;
 
+@NonNullByDefault
 final class GreeterService implements ReActor {
 
     @Nonnull
