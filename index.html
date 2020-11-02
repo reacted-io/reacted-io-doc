@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <title>Document</title>
     <link rel="icon" href="_media/logo.ico">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-dark-mode@latest/dist/style.min.css"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="description" content="Description">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/vue.css">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-dark-mode@latest/dist/style.min.css"/>
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 </head>
 <body>
 <div id="app">Please wait...</div>
@@ -34,23 +33,35 @@
                 toggleBtnBg: "var(--theme-color)",
                 textColor: "var(--theme-color)"
               }
-       },
+        },
+
         // docsify-copy-code (defaults)
         copyCode: {
             buttonText : 'Copy to clipboard',
             errorText  : 'Error',
             successText: 'Copied'
-            }
+            },
+
+        // search configuration
+        search: 'auto', // default
+        search: {
+            maxAge: 86400000, // Expiration time, the default one day
+            paths: 'auto',
+            placeholder: 'Search...',
+            noData: 'No results!',
+            depth: 6,
+            hideOtherSidebarContent: false,
+        }
     }
 
 </script>
 <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
 <script src="//cdn.jsdelivr.net/npm/docsify-dark-mode@latest/dist/index.min.js"></script>
-<script src="https://unpkg.com/docsify-copy-code@2"></script>
-<!--<script src="//unpkg.com/docsify/lib/docsify.min.js"></script>-->
-<script src="//unpkg.com/mermaid/dist/mermaid.js"></script>
-<script src="//unpkg.com/docsify-mermaid@latest/dist/docsify-mermaid.js"></script>
 <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-java.js"></script>
+<script src="//unpkg.com/docsify-mermaid@latest/dist/docsify-mermaid.js"></script>
+<script src="//unpkg.com/mermaid/dist/mermaid.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.js"></script>
+<script src="https://unpkg.com/docsify-copy-code@2"></script>
 <script>
     mermaid.initialize({
       startOnLoad: true,
