@@ -7,6 +7,7 @@
     <a>&nbsp|&nbsp</a>
     <a style="  color:#00afef;
                       hover:red; 
+                      padding-top: 15px;
                       font-size: 15px;
                       font-weight: bold;
                       border-top: 5px solid #00afef">
