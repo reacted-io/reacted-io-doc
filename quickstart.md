@@ -347,7 +347,8 @@ final class GreeterService implements ReActor {
     public ReActions getReActions() {
         return ReActions.newBuilder()
                         .reAct(ReActorInit.class, 
-                              (reActorContext, init) -> reActorContext.logInfo("A reactor was born"))
+                               (raCtx, init) ->
+                                       raCtx.logInfo("{} was born", raCtx.getSelf().getReActorId().getReActorName()))
                         .reAct(GreetingsRequest.class,
                                (raCtx, greetingsRequest) -> raCtx.reply("Hello from " + 
                                                                         GreeterService.class.getSimpleName()))
@@ -484,13 +485,83 @@ With ReActed we can easily add to our choreography a *passive listener*, or with
 In this scenario the new microservice is not going to be directly involved into the communication, it simply has to be triggered
 whenever a new message is sent. All what we have to do is to connect our [subscriber](subscriptions.md#Full Subscription Use Case)
 to the same [channel](channel_drivers/kafka/kafka_main.md) and setup a `ReActor` with a `TypedSubscriptionPolicy.FULL` for 
-the message we are interested in. Alternatively, we can create a *subscibed [service](services.md)* to automatically parallelize
+the message we are interested in. Alternatively, we can create an unpublished *subscribed [service](services.md)* to automatically parallelize
 the handling of the intercepted messages.
 
+```java
+import io.reacted.core.config.reactors.ReActorConfig;
+import io.reacted.core.config.reactors.ServiceConfig;
+import io.reacted.core.reactors.ReActor;
+import io.reacted.core.typedsubscriptions.TypedSubscription;
+import io.reacted.core.config.reactorsystem.ReActorSystemConfig;
+import io.reacted.core.reactors.ReActions;
+import io.reacted.core.reactorsystem.ReActorSystem;
+import io.reacted.drivers.channels.kafka.KafkaDriver;
+import io.reacted.drivers.channels.kafka.KafkaDriverConfig;
+import io.reacted.patterns.NonNullByDefault;
 
+import javax.annotation.Nonnull;
 
+@NonNullByDefault
+public class QuickstartSubscriber {
+    public static void main(String[] args) {
+        var kafkaDriverConfig = KafkaDriverConfig.newBuilder()
+                                                 .setChannelName("KafkaQuickstartChannel")
+                                                 .setTopic("ReactedTopic")
+                                                 .setGroupId("QuickstartGroupSubscriber")
+                                                 .setMaxPollRecords(1)
+                                                 .setBootstrapEndpoint("localhost:9092")
+                                                 .build();
+        var showOffSubscriberSystem = new ReActorSystem(ReActorSystemConfig.newBuilder()
+                                                                           .addRemotingDriver(new KafkaDriver(kafkaDriverConfig))
+                                                                           .setReactorSystemName("ShowOffSubscriberReActorSystemName")
+                                                                           .build()).initReActorSystem();
+        showOffSubscriberSystem.spawnService(ServiceConfig.newBuilder()
+                                                          .setRouteeProvider(GreetingsRequestSubscriber::new)
+                                                          .setReActorName("DataCaptureService")
+                                                          .setRouteesNum(4)
+                                                          .setTypedSubscriptions(TypedSubscription.FULL.forType(GreeterService.GreetingsRequest.class))
+                                                          .build())
+                               .peekFailure(Throwable::printStackTrace)
+                               .ifError(error -> showOffSubscriberSystem.shutDown());
+    }
 
+    private static class GreetingsRequestSubscriber implements ReActor {
+        @Nonnull
+        @Override
+        public ReActorConfig getConfig() {
+            return  ReActorConfig.newBuilder()
+                                 .setReActorName("Worker")
+                                 .build();
+        }
 
+        @Nonnull
+        @Override
+        public ReActions getReActions() {
+            return ReActions.newBuilder()
+                            .reAct(GreeterService.GreetingsRequest.class,
+                                   (raCtx, greetingsRequest) ->
+                                           raCtx.logInfo("{} intercepted {}",
+                                                         raCtx.getSelf().getReActorId().getReActorName(),
+                                                         greetingsRequest))
+                            .build();
+        }
+    }
+}
+```
+Running all together and performing some requests from the client, will generate this output from the subscriber
+
+```text
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - [DataCaptureService-Worker-2] intercepted io.reacted.examples.quickstart.GreeterService$GreetingsRequest@2b7542d2
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - [DataCaptureService-Worker-3] intercepted io.reacted.examples.quickstart.GreeterService$GreetingsRequest@311368b7
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - [DataCaptureService-Worker-0] intercepted io.reacted.examples.quickstart.GreeterService$GreetingsRequest@3071cf95
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - [DataCaptureService-Worker-1] intercepted io.reacted.examples.quickstart.GreeterService$GreetingsRequest@2c084893
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - [DataCaptureService-Worker-2] intercepted io.reacted.examples.quickstart.GreeterService$GreetingsRequest@314cb92a
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - [DataCaptureService-Worker-3] intercepted io.reacted.examples.quickstart.GreeterService$GreetingsRequest@1b302964
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - [DataCaptureService-Worker-0] intercepted io.reacted.examples.quickstart.GreeterService$GreetingsRequest@250350f0
+[ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - [DataCaptureService-Worker-1] intercepted io.reacted.examples.quickstart.GreeterService$GreetingsRequest@4b21d813
+```
+The messages have been successfully intercepted and processed by routees in round robin
                                                           
 
 
