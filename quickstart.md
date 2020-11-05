@@ -476,6 +476,18 @@ would automatically start [dropping requests](mailboxes.md#Backpressuring Mailbo
 
 ## Remote message subscription
 
+In our infrastructure now we have a client that creates requests and sends them over Kafka, and a server that replies.
+Now we want to expand our microservices oriented infrastructure because suddenly we found out that keeping statistics
+about the `GreetingsRequets` is crucial. More precisely, we want to be able to react every time a new `GreetingsRequest`
+is sent, but without touching the previously deployed `QuickstartService`. 
+With ReActed we can easily add to our choreography a *passive listener*, or with ReActed terminology, a [typed subscriber](subscriptions.md).
+In this scenario the new microservice is not going to be directly involved into the communication, it simply has to be triggered
+whenever a new message is sent. All what we have to do is to connect our [subscriber](subscriptions.md#Full Subscription Use Case)
+to the same [channel](channel_drivers/kafka/kafka_main.md) and setup a `ReActor` with a `TypedSubscriptionPolicy.FULL` for 
+the message we are interested in. Alternatively, we can create a *subscibed [service](services.md)* to automatically parallelize
+the handling of the intercepted messages.
+
+
 
 
 

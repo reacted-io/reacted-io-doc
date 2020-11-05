@@ -21,7 +21,7 @@ within the current reactor system, but since due to the nature of the [channel](
 
 ## Use Cases
 
-### Local Subscription
+### Local Subscription Use Case
 
 Let's say that we just set up our log processing stack and we want to automatically push every log entry to a centralized
 remote log collector. With a local typed subscription we can easily implement a [change data capture](patterns.md) for
@@ -53,7 +53,7 @@ public static class LogInterceptor implements ReActor {
 }
 ```
 
-### Full Subscription
+### Full Subscription Use Case
 
 Let's say that we still have to push every log entry inside our centralized log collector, but we have no way to
 alter the code that is running on the machines or it's simply too much. The good thing is that these [reactor systems](reactor_system.md)
