@@ -1,3 +1,3 @@
 # gRPC Driver
 
-GRPC driver details
+[gRPC](https://www.grpc.io) driver allows ReActed nodes to talk with each other using **gRPC**.
