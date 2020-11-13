@@ -13,6 +13,10 @@ Unbounded list of messages. Messages are returned FIFO
 Bounded list of messages. Messages are returned FIFO. If a message delivery cannot be completed because the mailbox is
 full, the `DeliveryStatus` of the operation will be `BACKPRESSURED`
 
+## Type Coalescing Mailbox
+
+This mailbox delivers only the latest message received per message type.
+
 ## Priority Mailbox
 
 Unbounded mailbox that behaves like a heap. Messages are ordered according to comparison order
