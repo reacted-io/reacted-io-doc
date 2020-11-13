@@ -115,7 +115,7 @@ greeter.ask(new GreetingsRequest(), String.class, "Introduction request")
        .join()
        .ifSuccessOrElse(showOffSystem::logInfo, Throwable::printStackTrace);
 ```
-[Ask](messaging.md#Ask)-allows to receive a message from a `ReActor` from outside the scope of a [ReAction](reactor.md)
+[Ask](messaging.md#Ask) allows to receive a message from a `ReActor` from outside the scope of a [ReAction](reactor.md)
 
 Adding the above request just after the raction creation and running the program, the output becomes:
 
