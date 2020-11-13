@@ -452,9 +452,32 @@ marked as complete
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-2] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Child-2 is terminating
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-1] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Uncle is terminating
 ```
+## ReActor Configuration
 
+Now let's see how we can properly configure any `ReActor`.
 
+```java
+public final BuilderT setDispatcherName(String dispatcherName)
+```
+Defines the [dispatcher](dispatcher.md) where this reactor should run on. This can be useful if we do not want two or
+more reactors to compete for dispatcher, if we want to improve the responsiveness of one reactor set or if we want to
+relegate potentially blocking reactors to a low priority and potentially blocked dispatcher.
 
+```java        
+public final BuilderT setReActorName(String reActorName)
+```
+Defines the `ReActor` name. In any moment, a reactor name must be unique among its alive siblings.
 
+```java
+public final BuilderT setMailBoxProvider(Function<ReActorContext, MailBox> mailBoxProvider)
+```
+Defines the [mailbox](mailboxes.md) provider for the reactor. It can be used for defining a [delivery priority](mailboxes.md#Priority-Mailbox)
+among the received messages, [backpressuring strategies](mailboxes.md#Backpressuring-Mailbox), 
+[compaction strategies](mailboxes.md#Type-Coalescing-Mailbox), [memory control strategies](mailboxes.md#Bounded-Mailbox) and so on.
+
+```java
+public final BuilderT setTypedSubscriptions(TypedSubscription... typedSubscriptions)
+```
+Defines the [typed subscriptions](subscriptions.md) for this reactor.
 
 
