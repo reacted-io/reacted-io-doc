@@ -3,14 +3,14 @@
 A `Service` is a `ReActor` with some out of the box behaviors that allow to easily and reliably a [published](registry_drivers/README.md) functionality.
 This means that when publishing a `Service`, it will be automatically published on all the registered [service registries](channel_drivers/README.md), 
 it will be automatically made [discoverable](#Service Discovery), [searchable](#Service Discovery), [updated](#Search Criteria) and [vertically scalable](#How a Service works).
-A `Service` acts like a one-stop-shop a certain `ReActor` has to be published, *locally* or [*remotely*](services.md#Remote Services).
+A `Service` acts like a one-stop-shop a certain `ReActor` has to be published, *locally* or [*remotely*](services.md#Remote-Services).
 **Elastic horizontal scalability is planned, but not yet implemented.**  
 
 ## How a Service works
 
 A `Service` acts as a message router. On creation, it [spawns](reactor.md) the configured number of **routees**. A routee is a `ReActor` whose
 behavior has been defined by the user while configuring the `Service` itself. So, a `Service` does not have any business related behavior,
-it only manages system tasks such as publication, [system statistics refresh](reactor_system.md#System Monitor), [discovery](#Service Discovery), [load balancing](#Logical load balancing) 
+it only manages system tasks such as publication, [system statistics refresh](reactor_system.md#System-Monitor), [discovery](#Service Discovery), [load balancing](#Logical load balancing) 
 and routee maintenance. Once a message is sent to a `Service`, it *routes* the message towards one if its routees, according to the
 configured load balancing policies.
 A `Service` always tries to keep its configuration enforced. If it has been configured for having **N** routees, they are spawned on `Service` creation.
@@ -31,7 +31,7 @@ It depends on the `SelectionType`. Currently supported only for [local services]
 specify if the `ReActorRef` that should be returned by a successful [service discovery](#Service Discovery) should be a direct reference
 to a routee (`SelectionType.DIRECT`) if you want to skip the extra hop with the risk to hammer on a overloaded routee, or instead a reference
 to the router (`SelectionType.ROUTED`) with the benefits of [load balancing](#Logical load balancing), [resiliency](#How a Service works) and
-[backpressuring](mailboxes.md#Backpressuring Mailbox) in case the `Service` has been configured to provide it. 
+[backpressuring](mailboxes.md#Backpressuring-Mailbox) in case the `Service` has been configured to provide it. 
 
 ## Service Discovery
 
@@ -77,7 +77,7 @@ A regexp for matching the service hostname
 public final Builder setCpuLoad(@Nullable Range<Double> cpuLoad)
 ```
 A [Range](https://guava.dev/releases/30.0-jre/api/docs/com/google/common/collect/Range.html) of the average cpu load of the machine where the service is running on.
-This value is periodically refreshed by the [system monitor](reactor_system.md#System Monitor)
+This value is periodically refreshed by the [system monitor](reactor_system.md#System-Monitor)
 
 ```java
 public final Builder setChannelId(Set<ChannelId> channelIdSet)
@@ -100,14 +100,14 @@ If it is envisioned the use of just *local services*, specifying a [service regi
 
 ## Backpressured service
 
-A `Service` can automatically benefit of the backpressuring features provided by ReActed if a [backpressuring mailbox](mailboxes.md#Backpressuring Mailbox)
+A `Service` can automatically benefit of the backpressuring features provided by ReActed if a [backpressuring mailbox](mailboxes.md#Backpressuring-Mailbox)
 is specified in its configuration.
 
 ## Remote Services
 
 A service can be *published* just using `ServiceConfig.Builder::setIsRemoteService(boolean remoteService)`. If set to `true`, this triggers
-the publication of the service on the [available service registries](registry_drivers/README.md). Such a subscription is refreshed [periodically](reactor_system.md#Configure a ReActorSystem).
-A `Service` is published on a specific [channel](channel_drivers/README.md), so a `Service` is going to be published for [all the channels available](channel_drivers/README.md#Remote Channels) from the publishing reactor system.
+the publication of the service on the [available service registries](registry_drivers/README.md). Such a subscription is refreshed [periodically](reactor_system.md#Configure-a ReActorSystem).
+A `Service` is published on a specific [channel](channel_drivers/README.md), so a `Service` is going to be published for [all the channels available](channel_drivers/README.md#Remote-Channels) from the publishing reactor system.
 If a `Service` should be terminated, it automatically withdraws from the cluster.
 
 

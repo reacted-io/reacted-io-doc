@@ -19,9 +19,9 @@ On network failure, the driver deactivates all the [`active gates`](../channel_d
 This means that it will not be possible communicating anymore through **any new** `ReActorRef` pointing towards the deactivated gate. Every communication
 attempt will result into a `DeliveryStatus.NOT_DELIVERED`.
 
-> For example, let's assume that the service registry suddenly goes offline. It will be possible keep using a `ReActorRef` to
-> a `Service` previously discovered, but if we should receive a message coming from one reactor system that was managed by the
-> offline service registry, it will not be possible replying.  
+!> For example, let's assume that the service registry suddenly goes offline. It will be possible keep using a `ReActorRef` to
+!> a `Service` previously discovered, but if we should receive a message coming from one reactor system that was managed by the
+!> offline service registry, it will not be possible replying.  
 
 
 

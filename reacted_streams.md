@@ -18,7 +18,7 @@ Subscription is possible through one of the many Java Flow-compatible subscribe 
 parameters can hugely impact the behaviour and the performances of your application. The most fine tunable overload,
 accepts a `ReActedSubscription` that gives you full control over the subscription behavior.
 
-> NOTE: Also subscriptions can be **named**. Using an unnamed subscription will result in a [non replayable](replaying.md) stream.
+!> NOTE: Also subscriptions can be **named**. Using an unnamed subscription will result in a [non replayable](replaying.md) stream.
 
 In ReActed, backpressuring policies and behaviours are controlled by the subscriber since subscribers might be *many* with different
 requirements or resource constraints. Every backpressured subscriber, behaves like a [Java Submission Publisher subscriber](https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/SubmissionPublisher.html).

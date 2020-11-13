@@ -32,11 +32,11 @@ without processing any further message present in the mailbox. On termination `R
 terminating reactor, so the appropriate behavior can be customized providing the appropriate reaction in the reactor's
 configuration 
 
->NOTE: A reactor termination has a top down behavior: once a reactor has been terminated, all its children will be
->recursively terminated as well. The ratio behind this is that a child can be terminated when there is nothing waiting 
->for it, otherwise we could kill something required by a still operating father reactor. *The termination will be 
->considered and marked as completed when the whole hierarchy has been terminated*, so after that the CompletionStage
->returned by `stop` is completed
+!>NOTE: A reactor termination has a top down behavior: once a reactor has been terminated, all its children will be
+!>recursively terminated as well. The ratio behind this is that a child can be terminated when there is nothing waiting 
+!>for it, otherwise we could kill something required by a still operating father reactor. *The termination will be 
+!>considered and marked as completed when the whole hierarchy has been terminated*, so after that the CompletionStage
+!>returned by `stop` is completed
 
 ## Creating a ReActor
 

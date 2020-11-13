@@ -14,4 +14,4 @@ It can be easily configured using its configuration builder and added at the cre
                                        .addServiceRegistryDriver(new ZooKeeperDriver(zooKeeperCfg))
 ```
 
-> NOTE: ZooKeeper Driver only supports ZooKeeper 3.6+ 
+!> NOTE: ZooKeeper Driver only supports ZooKeeper 3.6+ 

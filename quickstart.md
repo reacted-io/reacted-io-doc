@@ -115,7 +115,7 @@ greeter.ask(new GreetingsRequest(), String.class, "Introduction request")
        .join()
        .ifSuccessOrElse(showOffSystem::logInfo, Throwable::printStackTrace);
 ```
-[Ask](messaging.md#Ask) allows to receive a message from a `ReActor` from outside the scope of a [ReAction](reactor.md)
+[Ask](messaging.md#Ask)-allows to receive a message from a `ReActor` from outside the scope of a [ReAction](reactor.md)
 
 Adding the above request just after the raction creation and running the program, the output becomes:
 
@@ -128,7 +128,7 @@ Process finished with exit code 0
 
 ## Greetings service
 
-Now let's transform this `Greeter` into a [Service](services.md). As a service it can be [discovered](services.md#Service Discovery)
+Now let's transform this `Greeter` into a [Service](services.md). As a service it can be [discovered](services.md#Service-Discovery)
 and queried without previously having its `ReActorRef`, like we did in the example above.
 
 ```java
@@ -189,7 +189,7 @@ public class Quickstart {
 }
 ```
 
-Notice that we changed the [service replica factor](services.md#How a Service works) to `2`. For this reason, the
+Notice that we changed the [service replica factor](services.md#How-a Service works) to `2`. For this reason, the
 output of the above program is
 
 ```text
@@ -201,14 +201,14 @@ Process finished with exit code 0
 
 ## Querying Greetings Service
 
-For querying a `Service` a `ReActorRef` is required. We must then make it *discoverable* allowing it to receive to [service discovery](services.md#Service Discovery) requests.
+For querying a `Service` a `ReActorRef` is required. We must then make it *discoverable* allowing it to receive to [service discovery](services.md#Service-Discovery) requests.
 
 ```java
 .setTypedSubscriptions(TypedSubscriptionPolicy.LOCAL.forType(ServiceDiscoveryRequest.class))
 ```
-Just adding a [local subscription](subscriptions.md#Local Subscription) for the `ServiceDiscoveryRequest` message type is enough.
+Just adding a [local subscription](subscriptions.md#Local-Subscription) for the `ServiceDiscoveryRequest` message type is enough.
 
-For discovering it we simply define a [search filter](services.md#Search Criteria) and perform a search:
+For discovering it we simply define a [search filter](services.md#Search-Criteria) and perform a search:
 
 ```java
     public static void main(String[] args) {
@@ -266,7 +266,7 @@ communicating with other [reactor systems](reactor_system.md). Let's publish `Gr
 
 You can quickly setup a Kafka instance using [this tutorial](https://kafka.apache.org/quickstart).
 
-> NOTE: ReActed [ZooKeeper driver](registry_drivers/zookeeper/zookeeper_main.md) is compatible ONLY with ZooKeeper 3.6+ 
+!> NOTE: ReActed [ZooKeeper driver](registry_drivers/zookeeper/zookeeper_main.md) is compatible ONLY with ZooKeeper 3.6+ 
 
 Once Kafka it's up and running we need to:
  - setup [ZooKeeper server registry driver](registry_drivers/zookeeper/zookeeper_main.md). 
@@ -312,8 +312,8 @@ Launching it after all the log lines from Zookeeper and Kafka drivers, we get
 ```text
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Service Greetings published
 ```
-It's perfectly normal seeing more lines like this, it's the [system monitor](reactor_system.md#System Monitor) that is refreshing the service statistics
-and the [remoting root reactor](reactor_system.md#System Remoting Root) propagates these information towards the [service registry drivers](registry_drivers/README.md) that
+It's perfectly normal seeing more lines like this, it's the [system monitor](reactor_system.md#System-Monitor) that is refreshing the service statistics
+and the [remoting root reactor](reactor_system.md#System-Remoting Root) propagates these information towards the [service registry drivers](registry_drivers/README.md) that
 *react* refreshing the publications.
 
 ## Querying a published service
@@ -473,7 +473,7 @@ Changing the mailbox provider of the `Service` like this
 .setMailBoxProvider(BackpressuringMbox::newDefaultMailBox)
 ```
 
-would automatically start [dropping requests](mailboxes.md#Backpressuring Mailbox) if the service cannot keep up with them.
+would automatically start [dropping requests](mailboxes.md#Backpressuring-Mailbox) if the service cannot keep up with them.
 
 ## Remote message subscription
 
@@ -483,7 +483,7 @@ about the `GreetingsRequets` is crucial. More precisely, we want to be able to r
 is sent, but without touching the previously deployed `QuickstartService`. 
 With ReActed we can easily add to our choreography a *passive listener*, or with ReActed terminology, a [typed subscriber](subscriptions.md).
 In this scenario the new microservice is not going to be directly involved into the communication, it simply has to be triggered
-whenever a new message is sent. All what we have to do is to connect our [subscriber](subscriptions.md#Full Subscription Use Case)
+whenever a new message is sent. All what we have to do is to connect our [subscriber](subscriptions.md#Full-Subscription Use Case)
 to the same [channel](channel_drivers/kafka/kafka_main.md) and setup a `ReActor` with a `TypedSubscriptionPolicy.FULL` for 
 the message we are interested in. Alternatively, we can create an unpublished *subscribed [service](services.md)* to automatically parallelize
 the handling of the intercepted messages.

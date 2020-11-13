@@ -29,10 +29,10 @@ A failed communication will not be automatically reattempted.
 Tells a message to a destination. Its returned `CompletionStage` is going to be completed once the message has been
 *written* on the [communication channel](channel_drivers/README.md).
 
-> NOTE: Implementation detail: on a [local direct channel](channel_drivers/README.md#Direct Channels) a `tell` is always going to be
-> completed with the outcome of the delivery into the target's mailbox. This because there is no other medium than memory
-> between source and destination. A delivery can fail (i.e. a [bounded mailbox](mailboxes.md#Bounded Mailbox) refuses the message,
-> but message cannot be lost on *local direct channels*. If you are looking for performances this is the way to go
+!> NOTE: Implementation detail: on a [local direct channel](channel_drivers/README.md#Direct-Channels) a `tell` is always going to be
+!> completed with the outcome of the delivery into the target's mailbox. This because there is no other medium than memory
+!> between source and destination. A delivery can fail (i.e. a [bounded mailbox](mailboxes.md#Bounded-Mailbox) refuses the message,
+!> but message cannot be lost on *local direct channels*. If you are looking for performances this is the way to go
 
 ## Atell
 
@@ -41,7 +41,7 @@ acked by the destination. The destination acks a delivery request once a result 
 that if the destination is performing some kind of backpressuring on the delivery requests and the request is suspended,
 an ack will not be generated until the operation is completed, regardless of its result.
 So, if the returned `Try<DeliveryStatus>` is a success and the status is `DELIVERED`, it provides delivery guarantee within the
-target's mailbox. `atell` is automatically transformed into a `tell` on [local direct channels](channel_drivers/README.md#Direct Channels),
+target's mailbox. `atell` is automatically transformed into a `tell` on [local direct channels](channel_drivers/README.md#Direct-Channels),
 so using it provides delivery guarantee or explicit failure regardless on the location or the [channel type](channel_drivers/README.md) used to reach
 the recipient. Since a remote peer may never complete the operation due to a crash, `atell` requests may be automatically
 completed with a `Failure` carrying a `TimeoutException`. Please note that `atell` provides you with more detailed information

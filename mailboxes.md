@@ -23,7 +23,7 @@ Unbounded mailbox that behaves like a heap. Messages are ordered according to co
 
 ## Inflatable Mailbox
 
-[Bounded mailbox](mailboxes.md#Bounded Mailbox) that can have its maximum size programmatically adjusted 
+[Bounded mailbox](mailboxes.md#Bounded-Mailbox) that can have its maximum size programmatically adjusted 
 
 ## Null Mailbox
 
@@ -38,8 +38,8 @@ with the difference that any ```java public CompletionStage<Try<DeliveryStatus>>
 *always* asynchronously completed. Chaining actions on the returned `CompletionStage` has the effect to execute them
 once the delivery attempt has been completed, so after that the backpressure had taken place.
 
-> NOTE: When using Backpressuring mailbox, you must explicitly communicate when you can receive other messages, exactly
-> how you would do with [Reacted Streams](reacted_streams.md) and [Java Flow Subscription - request](https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/Flow.Subscription.html#request-long-)
+!> NOTE: When using Backpressuring mailbox, you must explicitly communicate when you can receive other messages, exactly
+!> how you would do with [Reacted Streams](reacted_streams.md) and [Java Flow Subscription - request](https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/Flow.Subscription.html#request-long-)
 
 ### Backpressuring Mailbox Configuration
 
@@ -105,6 +105,6 @@ automatically created by the mailbox for this task. A sequencer can be safely sh
 ``` 
 The `ReActorContext` of the `ReActiveEntity` that is using this this mailbox.
 
-> NOTE: **ReActed** and `BackpressuringMailbox` are completely agnostic about the location of the sender of the messages.
-> This means that it can be used to automatically backpressure **remote** producers too
+!> NOTE: **ReActed** and `BackpressuringMailbox` are completely agnostic about the location of the sender of the messages.
+!> This means that it can be used to automatically backpressure **remote** producers too
 

@@ -88,7 +88,7 @@ on those values can be performed. This option specifies how often those statisti
  public Builder addDispatcherConfig(DispatcherConfig dispatcherConfig)
 ```  
 Allows you to define a new [dispatcher](dispatcher.md). Up to `ReActorSystemConfig.MAX_DISPATCHERS_CONFIGS` are allowed.
-Defining extra dispatchers is an effective way to [separate the load type](patterns.md#Managing blocking operations) within a reactor system.
+Defining extra dispatchers is an effective way to [separate the load type](patterns.md#Managing-blocking operations) within a reactor system.
 
 ```java
  public Builder addRemotingDriver(RemotingDriver<? extends ChannelDriverConfig<?, ?>> remotingDriver)
