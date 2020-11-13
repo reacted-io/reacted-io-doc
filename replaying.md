@@ -29,8 +29,8 @@ happens through messages it can be fully recorded from a local driver. This impl
 or with a remote web service can be logged and replayed whether [properly implemented](patterns.md#ReActor-Factory).
 
 !> NOTE: What ReActed can do is replaying all the messages that were exchanged within a session. More your application
-!> is written in a event sourced style, more the replay feature becomes useful. More parts do not interact with ReActed
-!> messaging, more replay coverage you loose. You can find a showoff implementation of a web app backend that interacts 
-!> with web clients, microservices and a database in a fully replayable way in the examples [package](https://github.com/reacted-io/reacted/tree/master/examples/src/main/java/io/reacted/examples/webappbackend)
+is written in a event sourced style, more the replay feature becomes useful. More parts do not interact with ReActed
+messaging, more replay coverage you loose. You can find a showoff implementation of a web app backend that interacts 
+with web clients, microservices and a database in a fully replayable way in the examples [package](https://github.com/reacted-io/reacted/tree/master/examples/src/main/java/io/reacted/examples/webappbackend)
 
   

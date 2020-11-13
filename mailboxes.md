@@ -39,7 +39,7 @@ with the difference that any ```java public CompletionStage<Try<DeliveryStatus>>
 once the delivery attempt has been completed, so after that the backpressure had taken place.
 
 !> NOTE: When using Backpressuring mailbox, you must explicitly communicate when you can receive other messages, exactly
-!> how you would do with [Reacted Streams](reacted_streams.md) and [Java Flow Subscription - request](https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/Flow.Subscription.html#request-long-)
+how you would do with [Reacted Streams](reacted_streams.md) and [Java Flow Subscription - request](https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/Flow.Subscription.html#request-long-)
 
 ### Backpressuring Mailbox Configuration
 
@@ -106,5 +106,5 @@ automatically created by the mailbox for this task. A sequencer can be safely sh
 The `ReActorContext` of the `ReActiveEntity` that is using this this mailbox.
 
 !> NOTE: **ReActed** and `BackpressuringMailbox` are completely agnostic about the location of the sender of the messages.
-!> This means that it can be used to automatically backpressure **remote** producers too
+his means that it can be used to automatically backpressure **remote** producers too
 

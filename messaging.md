@@ -30,9 +30,9 @@ Tells a message to a destination. Its returned `CompletionStage` is going to be 
 *written* on the [communication channel](channel_drivers/README.md).
 
 !> NOTE: Implementation detail: on a [local direct channel](channel_drivers/README.md#Direct-Channels) a `tell` is always going to be
-!> completed with the outcome of the delivery into the target's mailbox. This because there is no other medium than memory
-!> between source and destination. A delivery can fail (i.e. a [bounded mailbox](mailboxes.md#Bounded-Mailbox) refuses the message,
-!> but message cannot be lost on *local direct channels*. If you are looking for performances this is the way to go
+completed with the outcome of the delivery into the target's mailbox. This because there is no other medium than memory
+between source and destination. A delivery can fail (i.e. a [bounded mailbox](mailboxes.md#Bounded-Mailbox) refuses the message,
+but message cannot be lost on *local direct channels*. If you are looking for performances this is the way to go.
 
 ## Atell
 

@@ -21,10 +21,10 @@ think about the dispatchers that can be multiple and multi threaded a direct con
 at the *same* time. Other than that, without some centralized and sequential control of the executed actions it would
 not possible defining an exact and correct execution total order.
 
-!> For this reason, *replay driver* does not embrace total ordering but a **causal** ordering. 
-!> ReActed *replay driver* guarantees that a message is not going to be *replayed* before its place in the cause-effect
-!> **flow of the original execution** and is going to be replayed in the exact execution order of the reactor that receives it.
-!> **The replay is going to be *consistent* per flow basis and *exact* per reactor basis.**
+!> For this reason, *replay driver* does not embrace total ordering but a **causal** ordering.
+ReActed *replay driver* guarantees that a message is not going to be *replayed* before its place in the cause-effect
+**flow of the original execution** and is going to be replayed in the exact execution order of the reactor that receives it.
+**The replay is going to be *consistent* per flow basis and *exact* per reactor basis.**
 
 Execution flows that are not entwined might receive messages in a different **total** order from the original session,
 but the replayed execution order is always going to be consistent per flow and exact per reactor.
@@ -69,12 +69,12 @@ Long story short: due to the concurrency, the recorded send order is not totally
 execution order is per reactor guaranteed.
 
 !>NOTE: *Replay Driver* is about delivery messages in the execution order found from the recorded session, it has no
-!>notion of delays. This means that while replaying a session, a `ReActor` might receive a response for something that
-!>is still being computed. This does not violate the causality, because in replayed sessions no output is actually delivered,
-!>so from the `ReActor` perspective everything is consistent. In the Loki-smashing example, this means that while replaying
-!>a session, Iron Man could receive a reply from Hulk while **Loki `ReActor`** is still performing the smashing loop.
-!>Is it a problem? Not as long `ReActors` talk to each other using messages, because the total ordering is controlled and
-!>guaranteed by the recorded session and by the replay driver
+notion of delays. This means that while replaying a session, a `ReActor` might receive a response for something that
+is still being computed. This does not violate the causality, because in replayed sessions no output is actually delivered,
+so from the `ReActor` perspective everything is consistent. In the Loki-smashing example, this means that while replaying
+a session, Iron Man could receive a reply from Hulk while **Loki `ReActor`** is still performing the smashing loop.
+Is it a problem? Not as long `ReActors` talk to each other using messages, because the total ordering is controlled and
+guaranteed by the recorded session and by the replay driver
 
 ## Naming
 
