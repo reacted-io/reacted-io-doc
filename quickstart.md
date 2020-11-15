@@ -3,6 +3,8 @@
 If you are in a rush to be productive with ReActed and you do not need any detailed explanation, this section is for you. 
 I will show a quick setup that will allow you to start experimenting.
 
+If you want code snippets you can check the [examples](https://github.com/reacted-io/reacted/tree/master/examples) module, otherwise keep reading.
+
 As first thing, download the latest version of ReActed from [maven repository](https://mvnrepository.com/artifact/io.reacted/reacted-framework)
 
 ## Creating a ReActorSystem
