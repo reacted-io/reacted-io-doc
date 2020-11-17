@@ -3,6 +3,8 @@
 If you are in a rush to be productive with ReActed and you do not need any detailed explanation, this section is for you. 
 I will show a quick setup that will allow you to start experimenting.
 
+If you want code snippets you can check the [examples](https://github.com/reacted-io/reacted/tree/master/examples) module, otherwise keep reading.
+
 As first thing, download the latest version of ReActed from [maven repository](https://mvnrepository.com/artifact/io.reacted/reacted-framework)
 
 ## Creating a ReActorSystem
@@ -189,7 +191,7 @@ public class Quickstart {
 }
 ```
 
-Notice that we changed the [service replica factor](services.md#How-a Service works) to `2`. For this reason, the
+Notice that we changed the [service replica factor](services.md#How-a-Service-works) to `2`. For this reason, the
 output of the above program is
 
 ```text
@@ -313,7 +315,7 @@ Launching it after all the log lines from Zookeeper and Kafka drivers, we get
 [ReActed-Dispatcher-Thread-ReactorSystemDispatcher-3] INFO io.reacted.core.reactors.systemreactors.SystemLogger - Service Greetings published
 ```
 It's perfectly normal seeing more lines like this, it's the [system monitor](reactor_system.md#System-Monitor) that is refreshing the service statistics
-and the [remoting root reactor](reactor_system.md#System-Remoting Root) propagates these information towards the [service registry drivers](registry_drivers/README.md) that
+and the [remoting root reactor](reactor_system.md#System-Remoting-Root) propagates these information towards the [service registry drivers](registry_drivers/README.md) that
 *react* refreshing the publications.
 
 ## Querying a published service
@@ -483,7 +485,7 @@ about the `GreetingsRequets` is crucial. More precisely, we want to be able to r
 is sent, but without touching the previously deployed `QuickstartService`. 
 With ReActed we can easily add to our choreography a *passive listener*, or with ReActed terminology, a [typed subscriber](subscriptions.md).
 In this scenario the new microservice is not going to be directly involved into the communication, it simply has to be triggered
-whenever a new message is sent. All what we have to do is to connect our [subscriber](subscriptions.md#Full-Subscription Use Case)
+whenever a new message is sent. All what we have to do is to connect our [subscriber](subscriptions.md#Full-Subscription-Use-Case)
 to the same [channel](channel_drivers/kafka/kafka_main.md) and setup a `ReActor` with a `TypedSubscriptionPolicy.FULL` for 
 the message we are interested in. Alternatively, we can create an unpublished *subscribed [service](services.md)* to automatically parallelize
 the handling of the intercepted messages.

@@ -1,7 +1,7 @@
 # Channel Drivers
 
 In ReActed communications are done over *channels*. A channel is defined as a pair of `ChannelId` and channel `Properties`.
-A `ChannelId` provides information about the `ChannelType` of the channel and its name, while channel `Properties` contain details
+A `ChannelId` provides information about the `ChannelType` of the channel and its *name*, while channel `Properties` contain details
 about how to contact the reactor system over the defined channel.
 
 ReActed abstracts the communication over the channel concept, so as soon as there is a *channel driver* it means that
@@ -47,6 +47,36 @@ This means that if a reactor system wishes to talk over two different channels u
 two channel(driver) instances should be configured. Please note that a driver/channel configuration does **not** define
 how to talk with *other* reactor systems over that channel, but allows you to provide details about how the current reactor system
 can be contacted by **other** reactor systems over that `ChannelId`
- 
+
+## Channel driver configuration
+
+Every channel driver allows you to specify different settings based on the technology it refers to, but all of them
+allow you to specify the following properties:
+
+```java 
+public final BuilderT setChannelName(String channelName)
+```
+The channel name. The pair `ChannelType` and name form a `ChannelId`.
+Since a ChannelId refers to a *logical* channel, different nodes may need to specify different properties for the same ChannelId
+because those define on how the *current node* can connect to the specified ChannelId. 
+
+```java
+public final BuilderT setChannelRequiresDeliveryAck(boolean isDeliveryAckRequiredByChannel)
+```
+Channels may or not may be reliable. This flag specifies if the channel may be trusted and so ACK will not be used
+even if explicitly requested by the [messaging api](../messaging.md#Atell).
+
+```java
+public final BuilderT setAtellAutomaticFailureAfterTimeout(Duration atellFailureTimeout)
+```
+[atell](../messaging.md#Atell) sends a message and wait for an ACK before marking the returned `CompletionStage` as
+completed. Since a remote [reactor system](../reactor_system.md) may never reply because of a network error or a system
+failure, a timeout for marking the *atell* as failed is required. This allows you to define how long should be waited
+before assuming that a message has been lost and completing the *atell* result with a failure.
+
+```java
+public final BuilderT setAckCacheCleanupInterval(Duration ackCacheCleanupInterval)
+```
+This option is hardly needed, but defines how often the status of the pending atell ACKs should be refreshed. 
 
 
