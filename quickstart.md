@@ -3,9 +3,19 @@
 If you are in a rush to be productive with ReActed and you do not need any detailed explanation, this section is for you. 
 I will show a quick setup that will allow you to start experimenting.
 
-If you want code snippets you can check the [examples](https://github.com/reacted-io/reacted/tree/master/examples) module, otherwise keep reading.
+## Quickstart Target
 
-As first thing, download the latest version of ReActed from [maven repository](https://mvnrepository.com/artifact/io.reacted/reacted-framework)
+In this quickstart guide we will create a small setup: a backpressured ReActed service published in a cluster will be
+queried by a ReActed client. The communication will be intercepted by another ReActed service that will react to the
+intercepted messages automatically scaling the load within its node. All these 3 nodes will talk to each other using Apache Kafka.
+
+If you want ready to use code snippets you can check the [examples](https://github.com/reacted-io/reacted/tree/master/examples/src/main/java/io/reacted/examples/quickstarts) module, otherwise keep reading.
+
+As first thing, download the latest version of ReActed from [maven repository](https://mvnrepository.com/artifact/io.reacted/reacted-framework), the latest
+version of [ZooKeeper here](https://www.apache.org/dyn/closer.lua/zookeeper/zookeeper-3.6.2/apache-zookeeper-3.6.2-bin.tar.gz) and of [Kafka](https://www.apache.org/dyn/closer.cgi?path=/kafka/2.6.0/kafka_2.13-2.6.0.tgz).
+
+!> Don't forget that if you want to use remote features, ReActed currently needs ZooKeeper 3.6+. The version bundled with kafka if not updated enough
+can be safely switched with the one downloaded from ZooKeeper website.
 
 ## Creating a ReActorSystem
 
