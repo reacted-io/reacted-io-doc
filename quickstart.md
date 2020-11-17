@@ -53,6 +53,8 @@ For this quickstart guide, let's create a `Hello World` reactor that greets the 
     private static final class GreetingsRequest implements Serializable { }
 ``` 
 
+## Running a ReActor
+
 Putting it all together and *spawning* the above `ReActivEntity` then becomes like this:
 
 ```java
@@ -128,7 +130,7 @@ Adding the above request just after the raction creation and running the program
 Process finished with exit code 0
 ```
 
-## Greetings service
+## Creating a Service
 
 Now let's transform this `Greeter` into a [Service](services.md). As a service it can be [discovered](services.md#Service-Discovery)
 and queried without previously having its `ReActorRef`, like we did in the example above.
