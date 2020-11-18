@@ -10,7 +10,7 @@ read or write from a certain medium type.
 
 ## Local Channels
 
-Also local communication within a [reactor system](../reactor_system.md) is abstracted over the channel concept, so
+Also local communication within a [reactor system](/reactor_system.md) is abstracted over the channel concept, so
 this can be configured as well. Since a local channel defines how local reactors talk to each other, it is possibile
 to specify only one local driver per reactor system
 
@@ -64,13 +64,13 @@ because those define on how the *current node* can connect to the specified Chan
 public final BuilderT setChannelRequiresDeliveryAck(boolean isDeliveryAckRequiredByChannel)
 ```
 Channels may or not may be reliable. This flag specifies if the channel may be trusted and so ACK will not be used
-even if explicitly requested by the [messaging api](../messaging.md#Atell).
+even if explicitly requested by the [messaging api](/messaging.md#Atell).
 
 ```java
 public final BuilderT setAtellAutomaticFailureAfterTimeout(Duration atellFailureTimeout)
 ```
-[atell](../messaging.md#Atell) sends a message and wait for an ACK before marking the returned `CompletionStage` as
-completed. Since a remote [reactor system](../reactor_system.md) may never reply because of a network error or a system
+[atell](/messaging.md#Atell) sends a message and wait for an ACK before marking the returned `CompletionStage` as
+completed. Since a remote [reactor system](/reactor_system.md) may never reply because of a network error or a system
 failure, a timeout for marking the *atell* as failed is required. This allows you to define how long should be waited
 before assuming that a message has been lost and completing the *atell* result with a failure.
 

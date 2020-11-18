@@ -1,7 +1,7 @@
 # Kafka Driver
 
 Kafka Driver allows ReActed nodes to talk each other using [Kafka](https://kafka.apache.org/).
-Other than the [common options](../README.md#Channel-driver-configuration) the supported kafka specific options are:
+Other than the [common options](/channel_drivers/README.md#Channel-driver-configuration) the supported kafka specific options are:
 
 ```java
 public Builder setBootstrapEndpoint(String bootstrapEndpoint)

@@ -1,7 +1,7 @@
 # Replay Driver
 
-Replay driver allows you to read the messages from a [recorded session](../../reactor_system.md#Session-Recording)
-saved with the [chronicle queue](../../channel_drivers/cq/cq_main.md) [local driver](../../channel_drivers/README.md) and to feed with them your [reactor system](../../reactor_system.md).
+Replay driver allows you to read the messages from a [recorded session](/reactor_system.md#Session-Recording)
+saved with the [chronicle queue](/channel_drivers/cq/cq_main.md) [local driver](/channel_drivers/README.md) and to feed with them your [reactor system](/reactor_system.md).
 
 ## Replay driver replay semantic
 
@@ -9,7 +9,7 @@ The word choice of the previous section has not been casual: ***replay driver* i
 recorded during a session recorded execution, is *not* about providing the same input and checking if the same output 
 is obtained.**. The only messages that are going to be delivered within a replayed session with the default *replay driver* 
 are the ones that were recorded and executed. What *replay driver* does is delivering messages in an appropriate order to actors living 
-within the reactor system. As described in the [replay section](../../replaying.md), it does not create reactors or reset 
+within the reactor system. As described in the [replay section](/replaying.md), it does not create reactors or reset 
 the state of the system, it feeds messages to your application logic and prevents from delivering un-recorded messages. 
 A realtime diff during replay is envisioned, but not yet implemented.  
 
@@ -61,7 +61,7 @@ sequenceDiagram
     Hulk->>Thor: She does not feel well
 ```
 
-The above two flows are not dependent on each other. This means that in [session recording](../../reactor_system.md#Session-Recording) the messages
+The above two flows are not dependent on each other. This means that in [session recording](/reactor_system.md#Session-Recording) the messages
 of the two flows could have been registered interleaving one flow with the other. What is guaranteed is that any `ReActor`, let's say *Hulk* will
 always be replayed using the exact order of the messages that were **executed and not sent** during the recording phase.
 
@@ -79,9 +79,9 @@ guaranteed by the recorded session and by the replay driver
 ## Naming
 
 *Replay driver* behavior is about delivering messages in an appropriate order to reactors that are waiting for them.
-This means that it must be able to find the exact destination of a message within the [local reactor system](../../reactor_system.md).
+This means that it must be able to find the exact destination of a message within the [local reactor system](/reactor_system.md).
 
-In the [reactors section](../../reactor.md) we learnt that a *spawned reactor* is uniquely targettable within a cluster
+In the [reactors section](/reactor.md) we learnt that a *spawned reactor* is uniquely targettable within a cluster
 through the location agnostic `ReActorRef`. One of the requirements for *spawning* a reactor, is providing a *reactor name*.
 
 *Replay driver* is the reason behind the advice of not choosing randomly generated reactor names: reactors with a randomly
@@ -92,8 +92,8 @@ know where to send the messages from the log. The destination would not match.
 
 In the [examples](https://github.com/reacted-io/reacted/tree/master/examples/src/main/java/io/reacted/examples/webappbackend)
 package is available a small example that shows how to build a system replaying-prone even if it depends on highly dynamic
-information such as web clients or external databases. The core concept is the use of the [reactor factory](../../patterns.md#ReActor-Factory) 
-pattern to overcome the [serialization constraint for messages](../../messaging.md) and the lack of non-replayable interaction
+information such as web clients or external databases. The core concept is the use of the [reactor factory](/patterns.md#ReActor-Factory) 
+pattern to overcome the [serialization constraint for messages](/messaging.md) and the lack of non-replayable interaction
 with the system to replicate clients' requests. Replicating the database interaction luckily is much easier, it's all
 about bridling the response coming from the database into a message.
 
