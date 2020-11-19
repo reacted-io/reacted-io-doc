@@ -3,8 +3,8 @@
 ReActed allows you to use one or more service registries at the same time. 
 In this way, ReActed can be used as hub or as a glue between different parts of your infrastructure. 
 A service registry is used to make a node active and searchable in the cluster and to publish `Services`. 
-Strictly speaking, any `ReActorRef` can be published for being contacted from a remote host, 
-a [service](/services.md) is a nice abstraction that provides you out of the box a set extra features.
+Strictly speaking, any `ReActorRef` can be published for being contacted from a remote host,
+a [service](/services.md) is a nice abstraction that provides a set extra features out of the box.
 
 A [`ReActorSystem`](/reactor_system.md) name **must** be unique within a cluster. This means that its reactor system name
 must be unique among all the reactor systems connected to the same service registries.
