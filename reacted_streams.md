@@ -4,13 +4,18 @@ A *reacted stream* is a *distributed*, *multi subscriber*, [*replayable*](replay
 out of the box. A *reacted stream publisher* is a `Serializable` entity, this means that the publisher can flow within
 a reacted cluster and any interested reactor can simply subscribe to it to start receiving its data.
 
-## Submission publisher
+## Publisher
 
 `ReactedSubmissionPublisher` is a [Java Flow](https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/Flow.html) compliant local and remote backpressured publisher.
 It can be created with ```java public ReactedSubmissionPublisher(ReActorSystem localReActorSystem, String feedName)``` where `feedName` is a unique
 publisher name. No publishers with the same name can coexist at the same moment.
 `ReactedSubmissionPublisher` is a `Serializable` entity, this means that can be sent through one of the [messaging primitives](messaging.md) to local or remote systems. 
-When messages are sent towards a remote subscriber, communication is always Point-to-Point also if two subscribers are within the same reactor system.
+When messages are sent towards a remote subscriber, communication is always Point-to-Point also if two or more subscribers are within the same reactor system.
+A publisher can be sent to any reactor also over the network. A remotely received publisher instance can be used for subscribing or publishing data.
+
+!> NOTE: Published data is always sent to the `Publisher` control reactor first because it's where a track of all the subscriptions. `Publisher` control reactor lives on the `ReactorSystem` where the
+publisher has been originally created. Every published message is broadcasted with a Point-to-Point communication towards all the subscribers. Publishing data using a `Publisher` instance sent remotely is allowed, 
+but requires an extra hop and a route towards the `Publisher` control.
 
 ## Subscription
 
